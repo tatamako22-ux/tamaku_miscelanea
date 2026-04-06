@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TAMAKU - Inventario Cloud Pro</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --blanco: #f5f5f5;
+            --negro: #111111;
+            --dorado: #d4af37;
+            --gris-claro: #eaeaea;
+            --verde: #27ae60;
+            --rojo: #e74c3c;
+            --azul: #3498db;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f5f5, #eaeaea);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .app {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 240px;
+            background: #fff;
+            border-right: 1px solid #ddd;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .logo { font-size: 22px; font-weight: 700; color: var(--dorado); }
+        .sub { font-size: 11px; color: #777; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px;}
+
+        .menu { flex: 1; }
+        .menu button {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 12px;
+            background: var(--gris-claro);
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: left;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #555;
+        }
+
+        .menu button.activo {
+            background: var(--dorado);
+            color: #fff;
+        }
+
+        /* --- CONTENIDO --- */
+        .content {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            background: #fdfdfd;
+        }
+
+        h2 { font-weight: 700; color: #333; margin-bottom: 20px; font-size: 24px; }
+
+        /* --- CARD REGISTRO --- */
+        .card {
+            background: #fff;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+
+        .grid-form {
+            display: grid;
+            grid-template-columns: 100px 1fr 100px 130px 100px;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .input-group { display: flex; flex-direction: column; gap: 8px; }
+        .label-text { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; }
+
+        input {
+            padding: 14px;
+            border-radius: 12px;
+            border: 2px solid #eee;
+            outline: none;
+            font-size: 14px;
+            background: #fafafa;
+            width: 100%;
+            transition: 0.3s;
+        }
+        input:focus { border-color: var(--dorado); background: #fff; }
+
+        /* --- BOTÓN GUARDAR CORREGIDO --- */
+        .btn-save {
+            background: var(--dorado);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+            font-size: 14px;
+            display: block;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);
+        }
+        .btn-save:active { transform: scale(0.96); }
+        .btn-save:hover { background: #b8962d; }
+
+        /* --- TABLA --- */
+        .table-container {
+            background: white;
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        th {
+            text-align: left;
+            padding: 15px;
+            border-bottom: 2px solid #eee;
+            color: #aaa;
+            text-transform: uppercase;
+            font-size: 10px;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f1f1f1;
+            font-size: 13px;
+        }
+
+        .ganancia-txt { color: var(--verde); font-weight: 700; }
+
+        /* --- RESPONSIVE IPHONE --- */
+        @media (max-width: 768px) {
+            .app { flex-direction: column; height: auto; overflow: auto; }
+            .sidebar {
+                width: 100%; height: auto; padding: 10px;
+                flex-direction: row; justify-content: space-around;
+                position: sticky; top: 0; z-index: 1500; border-right: none; border-bottom: 1px solid #ddd;
+            }
+            .sidebar .logo, .sidebar .sub { display: none; }
+            .menu { display: flex; gap: 5px; width: 100%; overflow-x: auto; padding-bottom: 5px; }
+            .menu button { margin-bottom: 0; font-size: 11px; padding: 12px 15px; white-space: nowrap; width: auto; }
+
+            .content { padding: 15px; height: auto; overflow: visible; }
+            .grid-form { 
+                grid-template-columns: 1fr 1fr; 
+                gap: 12px; 
+            }
+            .grid-form .input-group:nth-child(2) { grid-column: span 2; }
+            .btn-save { 
+                grid-column: span 2; 
+                padding: 16px; 
+                font-size: 16px; 
+                margin-top: 10px; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div class="sidebar">
+        <div>
+            <div class="logo">TAMAKU</div>
+            <div class="sub">Miscelánea & Cloud</div>
+        </div>
+
+        <div class="menu">
+            <button onclick="location.href='index.html'">🏠 Inicio</button>
+            <button onclick="location.href='ventas.html'">💰 Ventas</button>
+            <button class="activo">📦 Inventario</button>
+            <button onclick="alert('Próximamente')">➕ Agregar</button>
+            <button onclick="alert('Próximamente')">📊 Reportes</button>
+        </div>
+    </div>
+
+    <div class="content">
+        <h2>Inventario Cloud Profesional</h2>
+
+        <div class="card">
+            <h3 style="margin-bottom: 20px; font-size: 16px; color: #555;">📥 Registro de Productos</h3>
+            <div class="grid-form">
+                <div class="input-group">
+                    <span class="label-text">PLU (Cód)</span>
+                    <input type="number" id="cod" placeholder="1">
+                </div>
+                <div class="input-group">
+                    <span class="label-text">Nombre del Producto</span>
+                    <input type="text" id="nom" placeholder="Ej: Poker en lata">
+                </div>
+                <div class="input-group">
+                    <span class="label-text">Existencia</span>
+                    <input type="number" id="stock" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <span class="label-text">Costo Mayor</span>
+                    <input type="number" id="costo" placeholder="$">
+                </div>
+                <div class="input-group">
+                    <span class="label-text">% Ganancia</span>
+                    <input type="number" id="porcentaje" placeholder="%">
+                </div>
+                <div class="input-group" style="grid-column: span 2; width: 100%;">
+                    <button class="btn-save" onclick="guardarEnSupabase()">GUARDAR PRODUCTO</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cód</th>
+                        <th>Producto</th>
+                        <th>Stock</th>
+                        <th>Costo Mayor</th>
+                        <th>Venta Sugerida</th>
+                        <th>Utilidad Unit.</th>
+                        <th>Utilidad Total</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="listaProductosBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- CONFIGURACIÓN DE CONEXIÓN REAL ---
+    const supabaseUrl = 'https://pj4znagpafgh3td82cww.supabase.co'; 
+    const supabaseKey = 'sb_publishable_9pj_4ZnaGPafGh3TD82CWw_CaVdjAef';
+    
+    // Inicialización del cliente
+    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    const fmt = (n) => "$ " + Math.round(n || 0).toLocaleString('es-CO');
+
+    // --- CARGAR PRODUCTOS ---
+    async function cargarDesdeNube() {
+        try {
+            const { data, error } = await _supabase
+                .from('productos')
+                .select('*')
+                .order('codigo', { ascending: true });
+
+            if (error) throw error;
+            renderTabla(data);
+        } catch (err) {
+            console.error("Error al conectar:", err);
+            // Aviso más amigable
+            console.log("No se pudo conectar a Supabase. Verifica tu conexión o políticas RLS.");
+        }
+    }
+
+    // --- GUARDAR O ACTUALIZAR ---
+    async function guardarEnSupabase() {
+        const cod = parseInt(document.getElementById('cod').value);
+        const nom = document.getElementById('nom').value.trim().toUpperCase();
+        const stk = parseInt(document.getElementById('stock').value) || 0;
+        const cst = parseInt(document.getElementById('costo').value) || 0;
+        const por = parseInt(document.getElementById('porcentaje').value) || 0;
+
+        if (!cod || !nom) {
+            alert("⚠️ Por favor ingresa el Código PLU y el Nombre.");
+            return;
+        }
+
+        const utilidadUnitaria = cst * (por / 100);
+        const pVenta = cst + utilidadUnitaria;
+        const gTotal = utilidadUnitaria * stk;
+
+        try {
+            const { error } = await _supabase
+                .from('productos')
+                .upsert({ 
+                    codigo: cod, 
+                    nombre: nom, 
+                    stock: stk, 
+                    costo_mayor: cst, 
+                    porcentaje_ganancia: por,
+                    precio_venta: pVenta,
+                    ganancia_proyectada: gTotal
+                }, { onConflict: 'codigo' });
+
+            if (error) throw error;
+
+            alert("✅ Producto guardado y sincronizado.");
+            limpiarCampos();
+            cargarDesdeNube();
+        } catch (err) {
+            alert("❌ Error al guardar en la nube: " + err.message);
+        }
+    }
+
+    // --- ELIMINAR ---
+    async function borrarProducto(codigo) {
+        if (!confirm("¿Deseas eliminar este producto definitivamente de la nube?")) return;
+        try {
+            const { error } = await _supabase
+                .from('productos')
+                .delete()
+                .eq('codigo', codigo);
+
+            if (error) throw error;
+            cargarDesdeNube();
+        } catch (err) {
+            alert("Error al eliminar: " + err.message);
+        }
+    }
+
+    // --- RENDERIZAR TABLA ---
+    function renderTabla(lista) {
+        const cont = document.getElementById('listaProductosBody');
+        cont.innerHTML = "";
+        
+        lista.forEach(p => {
+            const utilUnit = p.precio_venta - p.costo_mayor;
+            cont.innerHTML += `
+                <tr>
+                    <td><b style="background:#eee; padding:5px 10px; border-radius:5px;">${p.codigo}</b></td>
+                    <td><b>${p.nombre}</b></td>
+                    <td>${p.stock} un.</td>
+                    <td>${fmt(p.costo_mayor)}</td>
+                    <td style="color:var(--azul); font-weight:700;">${fmt(p.precio_venta)}</td>
+                    <td style="color:var(--verde)">+ ${fmt(utilUnit)}</td>
+                    <td class="ganancia-txt">${fmt(p.ganancia_proyectada)}</td>
+                    <td>
+                        <button onclick="borrarProducto(${p.codigo})" style="background:none; border:none; color:var(--rojo); cursor:pointer; font-weight:bold; font-size:18px;">✕</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function limpiarCampos() {
+        document.getElementById('cod').value = "";
+        document.getElementById('nom').value = "";
+        document.getElementById('stock').value = "";
+        document.getElementById('costo').value = "";
+        document.getElementById('porcentaje').value = "";
+    }
+
+    window.onload = cargarDesdeNube;
+</script>
+
+</body>
+</html>

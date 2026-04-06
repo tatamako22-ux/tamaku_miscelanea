@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TAMAKU - Dashboard</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --blanco: #f5f5f5;
+            --negro: #111111;
+            --dorado: #d4af37;
+            --gris-claro: #eaeaea;
+            --azul: #3498db;
+            --verde: #27ae60;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f5f5, #eaeaea);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* --- LAYOUT PRINCIPAL --- */
+        .app {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        /* --- SIDEBAR (PC) --- */
+        .sidebar {
+            width: 240px;
+            background: #fff;
+            border-right: 1px solid #ddd;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .logo { font-size: 22px; font-weight: 700; color: var(--dorado); }
+        .sub { font-size: 11px; color: #777; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px;}
+
+        .menu { flex: 1; }
+        .menu button {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 12px;
+            background: var(--gris-claro);
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: left;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #555;
+        }
+
+        .menu button:hover { background: #e0e0e0; }
+        .menu button.activo {
+            background: var(--dorado);
+            color: #fff;
+        }
+
+        /* --- CONTENIDO --- */
+        .content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        h2 { font-weight: 700; color: #333; margin-bottom: 25px; font-size: 28px; }
+
+        /* --- GRID DE TARJETAS --- */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #fff;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.02);
+            transition: 0.3s;
+        }
+
+        .card:hover { transform: translateY(-5px); }
+
+        .card h3 { 
+            font-size: 14px; 
+            color: #888; 
+            text-transform: uppercase; 
+            margin-bottom: 10px; 
+            font-weight: 700;
+        }
+
+        .card .valor { 
+            font-size: 32px; 
+            font-weight: 700; 
+            color: var(--negro); 
+            display: block;
+        }
+
+        .card .detalle {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* Colores dinámicos para las tarjetas */
+        .card.ventas .valor { color: var(--verde); }
+        .card.cuentas .valor { color: var(--rojo); }
+
+        /* --- RESPONSIVE IPHONE --- */
+        @media (max-width: 768px) {
+            .app { flex-direction: column; height: auto; overflow: auto; }
+            .sidebar {
+                width: 100%; height: auto; padding: 10px;
+                flex-direction: row; justify-content: space-around;
+                position: sticky; top: 0; z-index: 1500; border-right: none; border-bottom: 1px solid #ddd;
+            }
+            .sidebar .logo, .sidebar .sub { display: none; }
+            .menu { display: flex; gap: 5px; width: 100%; overflow-x: auto; }
+            .menu button { margin-bottom: 0; font-size: 11px; padding: 10px; white-space: nowrap; width: auto; }
+
+            .content { padding: 20px; height: auto; }
+            h2 { font-size: 22px; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <div class="sidebar">
+        <div>
+            <div class="logo">TAMAKU</div>
+            <div class="sub">Dashboard Principal</div>
+        </div>
+
+        <div class="menu">
+            <button onclick="irInicio()" class="activo">🏠 Inicio</button>
+            <button onclick="irVentas()">💰 Ventas</button>
+            <button onclick="irInventario()">📦 Inventario</button>
+            <button onclick="irAgregar()">➕ Agregar</button>
+            <button onclick="irReportes()">📊 Reportes</button>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <h2>Resumen de Operaciones</h2>
+
+        <div class="grid">
+
+            <div class="card ventas">
+                <h3>💰 Ventas de hoy</h3>
+                <span class="valor" id="totalVentasHoy">$ 0</span>
+                <span class="detalle" id="cantidadVentas">0 transacciones hoy</span>
+            </div>
+
+            <div class="card cuentas">
+                <h3>🧾 Cuentas Abiertas</h3>
+                <span class="valor" id="totalDeudas">$ 0</span>
+                <span class="detalle" id="cantidadCuentas">0 clientes pendientes</span>
+            </div>
+
+            <div class="card">
+                <h3>📦 Productos</h3>
+                <span class="valor">Stock</span>
+                <span class="detalle">Gestión de inventario y PLU</span>
+            </div>
+
+            <div class="card">
+                <h3>📊 Reportes</h3>
+                <span class="valor">Análisis</span>
+                <span class="detalle">Ganancias mensuales y semanales</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    // --- NAVEGACIÓN ---
+    function irInicio(){ window.location.href = "index.html"; }
+    function irVentas(){ window.location.href = "ventas.html"; }
+    function irInventario(){ window.location.href = "inventario.html"; }
+    function irAgregar(){ alert("Módulo en desarrollo"); }
+    function irReportes(){ alert("Módulo en desarrollo"); }
+
+    // --- CARGAR DATOS REALES DEL SISTEMA ---
+    function cargarResumen() {
+        const fmt = (n) => "$ " + Number(n).toLocaleString('es-CO');
+        
+        // Obtener historial de ventas
+        const historial = JSON.parse(localStorage.getItem('tk_hist')) || [];
+        const hoy = new Date().toLocaleDateString();
+        const ventasHoy = historial.filter(v => v.fecha === hoy);
+        
+        // Sumar ventas de hoy
+        const totalDinero = ventasHoy.reduce((acc, v) => acc + v.total, 0);
+        document.getElementById('totalVentasHoy').innerText = fmt(totalDinero);
+        document.getElementById('cantidadVentas').innerText = ventasHoy.length + " transacciones hoy";
+
+        // Obtener cuentas abiertas
+        const cuentas = JSON.parse(localStorage.getItem('tk_cuentas')) || [];
+        const totalDeuda = cuentas.reduce((acc, c) => {
+            return acc + c.items.reduce((sum, item) => sum + item.sub, 0);
+        }, 0);
+
+        document.getElementById('totalDeudas').innerText = fmt(totalDeuda);
+        document.getElementById('cantidadCuentas').innerText = cuentas.length + " clientes pendientes";
+    }
+
+    // Ejecutar al cargar la página
+    window.onload = cargarResumen;
+</script>
+
+</body>
+</html>

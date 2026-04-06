@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TAMAKU - Ventas (Sincronizado)</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --blanco: #f5f5f5;
+            --negro: #111111;
+            --dorado: #d4af37;
+            --gris-claro: #eaeaea;
+            --verde: #27ae60;
+            --rojo: #e74c3c;
+            --azul: #3498db;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f5f5, #eaeaea);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .app {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        /* --- SIDEBAR PC --- */
+        .sidebar {
+            width: 240px;
+            background: #fff;
+            border-right: 1px solid #ddd;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .logo { font-size: 22px; font-weight: 700; color: var(--dorado); }
+        .sub { font-size: 12px; color: #777; margin-bottom: 20px; }
+
+        .menu { flex: 1; }
+        .menu button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 12px;
+            background: var(--gris-claro);
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: left;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .menu button.activo {
+            background: var(--dorado);
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* --- ÁREA DE TRABAJO --- */
+        .main-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .work-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .card h3 { margin-bottom: 12px; font-size: 18px; font-weight: 700; }
+        .label-text { font-size: 10px; font-weight: 700; color: #999; display: block; margin-top: 10px; text-transform: uppercase; }
+
+        .modo-selector { display: flex; gap: 10px; }
+        .btn-modo {
+            flex: 1; padding: 14px; border: none; border-radius: 14px;
+            font-weight: 700; cursor: pointer; transition: 0.3s;
+        }
+        .btn-modo.off { background: #eee; color: #888; }
+        .btn-modo.rapido-on { background: var(--azul); color: white; }
+        .btn-modo.cuenta-on { background: var(--dorado); color: white; box-shadow: 0 4px 10px rgba(212,175,55,0.3); }
+
+        .search-grid {
+            display: grid;
+            grid-template-columns: 80px 1fr 80px 100px;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid #eee;
+            font-size: 14px;
+            outline: none;
+        }
+        input:focus { border-color: var(--dorado); }
+
+        .result-box {
+            margin-top: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+            border-radius: 12px;
+            background: #fff;
+        }
+
+        .item-row {
+            padding: 12px;
+            border-bottom: 1px solid #f1f1f1;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* --- CARRITO (PC E IPHONE) --- */
+        .right-panel {
+            width: 380px;
+            background: #111;
+            color: #fff;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -10px 0 20px rgba(0,0,0,0.2);
+        }
+
+        .cart-header h2 { color: var(--dorado); font-size: 26px; }
+        .cart-list { flex: 1; overflow-y: auto; margin-top: 15px; }
+
+        .cart-item {
+            background: #1c1c1c;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 12px;
+            border-left: 5px solid var(--dorado);
+        }
+
+        .cart-item .main-info { display: flex; justify-content: space-between; font-weight: 600; font-size: 15px; }
+        .cart-item .details { font-size: 11px; color: #777; margin-top: 5px; }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dorado);
+            padding: 20px 0;
+            border-top: 1px solid #333;
+        }
+
+        .btn-acc { padding: 16px; border: none; border-radius: 15px; font-weight: 800; cursor: pointer; text-align: center; }
+        .btn-green { background: var(--verde); color: #fff; width: 100%; font-size: 18px; }
+        .btn-red-acc { background: #222; color: var(--rojo); width: 100%; margin-top: 10px; }
+
+        /* --- MODALES --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            z-index: 5000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(10px);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 30px;
+            width: 95%;
+            max-width: 850px;
+            color: #111;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .audit-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 18px;
+            text-align: center;
+            border: 1px solid #eee;
+        }
+        .summary-card b { display: block; font-size: 20px; color: var(--dorado); }
+
+        .audit-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 15px; }
+        .audit-table th { text-align: left; padding: 12px; border-bottom: 2px solid #eee; color: #999; text-transform: uppercase; }
+        .audit-table td { padding: 12px; border-bottom: 1px solid #f1f1f1; }
+
+        .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 9px; font-weight: 800; text-transform: uppercase;}
+        .bg-pagado { background: #d4edda; color: #155724; }
+        .bg-deuda { background: #f8d7da; color: #721c24; }
+
+        /* PAGO */
+        .pay-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 20px 0; }
+        .pay-btn {
+            padding: 20px 10px; border: 2px solid #eee; border-radius: 18px;
+            background: white; cursor: pointer; text-align: center; font-weight: 700;
+        }
+        .pay-btn.selected { border-color: var(--verde); background: #eafff0; }
+
+        /* --- RESPONSIVE IPHONE --- */
+        @media (max-width: 768px) {
+            .app { flex-direction: column; height: auto; overflow: auto; }
+            .sidebar {
+                width: 100%; height: auto; padding: 10px;
+                flex-direction: row; justify-content: space-around;
+                position: sticky; top: 0; z-index: 1500; border-right: none; border-bottom: 1px solid #ddd;
+            }
+            .sidebar .logo, .sidebar .sub { display: none; }
+            .menu { display: flex; gap: 5px; width: 100%; overflow-x: auto; }
+            .menu button { margin-bottom: 0; font-size: 11px; padding: 10px; white-space: nowrap; width: auto; }
+
+            .main-container { flex-direction: column; height: auto; }
+            .right-panel {
+                width: 100%; min-height: 100vh; border-radius: 35px 35px 0 0;
+                margin-top: 20px;
+            }
+            .search-grid { grid-template-columns: 1fr 1fr; }
+            .search-grid div:nth-child(2) { grid-column: span 2; }
+            .search-grid button { grid-column: span 2; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div class="sidebar">
+        <div>
+            <div class="logo">TAMAKU</div>
+            <div class="sub">Miscelánea & Cigarrería</div>
+        </div>
+
+        <div class="menu">
+            <button onclick="location.href='index.html'">🏠 Inicio</button>
+            <button class="activo" onclick="location.href='ventas.html'">💰 Ventas</button>
+            <button onclick="location.href='inventario.html'">📦 Inventario</button>
+            <button onclick="alert('Próximamente')">➕ Agregar</button>
+            <button onclick="alert('Próximamente')">📊 Reportes</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="work-area">
+            
+            <div class="card" style="background: #fff3cd; border: 1px solid #ffeeba;">
+                <h3 id="cajaStatus">📦 Caja Cerrada</h3>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button id="btnAbrir" class="btn-modo rapido-on" style="padding: 10px 20px;" onclick="abrirCaja()">Abrir Jornada</button>
+                    <button id="btnAudit" class="btn-modo rapido-on" style="display:none; background: var(--azul);" onclick="mostrarAuditoria()">📋 Auditoría de Hoy</button>
+                    <button id="btnCerrar" class="btn-modo off" style="display:none; background: var(--rojo); color:white" onclick="cerrarCaja()">Cerrar Caja</button>
+                </div>
+            </div>
+
+            <div id="panelVenta" style="display: none;">
+                <div class="card">
+                    <div class="modo-selector">
+                        <button id="modR" class="btn-modo rapido-on" onclick="setModo('rapido')">Venta Rápida</button>
+                        <button id="modC" class="btn-modo off" onclick="setModo('cuenta')">Cuenta Abierta</button>
+                    </div>
+                </div>
+
+                <div class="card" id="cardCuentas" style="display:none;">
+                    <h3>Cuentas Pendientes</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="inputCliente" placeholder="Nombre cliente...">
+                        <button class="btn-modo rapido-on" style="width: 100px" onclick="crearCuenta()">Abrir</button>
+                    </div>
+                    <div id="chipsCuentas" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                </div>
+
+                <div class="card">
+                    <h3>Selección de Productos</h3>
+                    <div class="search-grid">
+                        <div><label class="label-text">PLU</label><input type="number" id="plu" onfocus="this.value=''" oninput="buscarPlu()"></div>
+                        <div><label class="label-text">PRODUCTO</label><input type="text" id="nom" placeholder="Nombre..." oninput="buscarNombre()"></div>
+                        <div><label class="label-text">CANT.</label><input type="number" id="cant" value="0" onfocus="this.value=''"></div>
+                        <button class="btn-modo rapido-on" style="background:var(--dorado)" onclick="agregar()">AGREGAR</button>
+                    </div>
+                    <div class="result-box" id="res"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="cart-header">
+                <h2 id="cartTitle">Venta Rápida</h2>
+                <small id="reloj"></small>
+            </div>
+            <div class="cart-list" id="listaCarrito"></div>
+            <div class="total-section">
+                <div class="total-row"><span>Total</span><span id="totalTxt">$ 0</span></div>
+                <button class="btn-acc btn-green" onclick="abrirPago()">✅ REGISTRAR VENTA</button>
+                <button class="btn-acc btn-red-acc" onclick="cancelar()">❌ CANCELAR</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modalPago" class="modal-overlay">
+    <div class="modal-content" style="max-width: 450px; text-align: center;">
+        <h2 style="font-size: 28px;">Finalizar Pago</h2>
+        <h1 id="montoPago" style="font-size: 45px; margin: 20px 0; color: var(--dorado);">$ 0</h1>
+        <label class="label-text">Medio de Pago</label>
+        <div class="pay-grid">
+            <div class="pay-btn" id="payEfec" onclick="prepararMetodo('Efectivo')">💵<br>Efectivo</div>
+            <div class="pay-btn" id="payNeq" onclick="prepararMetodo('Nequi')">📱<br>Nequi</div>
+            <div class="pay-btn" id="payDav" onclick="prepararMetodo('Daviplata')">📲<br>Davi</div>
+        </div>
+        <div id="calcBox" style="display: none; background: #f9f9f9; padding: 20px; border-radius: 20px; margin-top: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span>¿Con cuánto paga?</span>
+                <input type="number" id="pagaCon" onfocus="this.value=''" oninput="calcularVueltas()" style="width: 130px; text-align: right; font-weight: 700; font-size: 18px;">
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
+                <b>Vueltas:</b><b id="vueltasTxt" style="color: var(--rojo); font-size: 24px;">$ 0</b>
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 25px;">
+            <button class="btn-acc btn-red-acc" style="background:#888; color:white;" onclick="document.getElementById('modalPago').style.display='none'">Volver</button>
+            <button class="btn-acc btn-green" onclick="procesarVenta()">CONFIRMAR</button>
+        </div>
+    </div>
+</div>
+
+<div id="modalAudit" class="modal-overlay">
+    <div class="modal-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="color: var(--dorado);">Auditoría Contable (Hoy)</h2>
+            <button onclick="document.getElementById('modalAudit').style.display='none'" style="background:none; border:none; font-size: 30px;">&times;</button>
+        </div>
+        <div class="audit-summary">
+            <div class="summary-card"><span>Efectivo</span><b id="aEfec">$ 0</b></div>
+            <div class="summary-card"><span>Nequi</span><b id="aNeq">$ 0</b></div>
+            <div class="summary-card"><span>Daviplata</span><b id="aDav">$ 0</b></div>
+            <div class="summary-card" style="background: #fff1f1;"><span style="color:var(--rojo)">Deuda</span><b id="aDeu" style="color:var(--rojo)">$ 0</b></div>
+        </div>
+        <table class="audit-table">
+            <thead><tr><th>Hora</th><th>Cliente</th><th>Producto</th><th>Cant.</th><th>Unidad</th><th>Subtotal</th><th>Estado</th></tr></thead>
+            <tbody id="auditBody"></tbody>
+        </table>
+        <button class="btn-acc btn-blue" style="width:100%; margin-top:30px; color:white;" onclick="document.getElementById('modalAudit').style.display='none'">Cerrar Auditoría</button>
+    </div>
+</div>
+
+<script>
+    // --- CONEXIÓN CON INVENTARIO ---
+    // Aquí está el truco: leemos la misma llave que usa el inventario
+    let PRODUCTOS_INVENTARIO = JSON.parse(localStorage.getItem('tamaku_productos')) || [];
+
+    let historial = JSON.parse(localStorage.getItem('tk_hist')) || [];
+    let cajaActiva = JSON.parse(localStorage.getItem('tk_caja')) || false;
+    let cuentas = JSON.parse(localStorage.getItem('tk_cuentas')) || [];
+    let carritoR = JSON.parse(localStorage.getItem('tk_carro_r')) || [];
+
+    let modo = 'rapido', cActiva = null, pSel = null, metTemp = "";
+    const fmt = (n) => "$ " + Math.round(n).toLocaleString('es-CO');
+
+    function sync() {
+        localStorage.setItem('tk_hist', JSON.stringify(historial));
+        localStorage.setItem('tk_caja', JSON.stringify(cajaActiva));
+        localStorage.setItem('tk_cuentas', JSON.stringify(cuentas));
+        localStorage.setItem('tk_carro_r', JSON.stringify(carritoR));
+    }
+
+    function abrirCaja() { if(confirm("¿Abrir jornada?")) { cajaActiva = true; sync(); renderCaja(); } }
+    function cerrarCaja() { if(confirm("¿Cerrar jornada?")) { cajaActiva = false; sync(); renderCaja(); } }
+    
+    function renderCaja() {
+        document.getElementById('panelVenta').style.display = cajaActiva ? "block" : "none";
+        document.getElementById('btnAbrir').style.display = cajaActiva ? "none" : "block";
+        document.getElementById('btnAudit').style.display = cajaActiva ? "block" : "none";
+        document.getElementById('btnCerrar').style.display = cajaActiva ? "block" : "none";
+        document.getElementById('cajaStatus').innerText = cajaActiva ? "🟢 Jornada Iniciada" : "📦 Caja Cerrada";
+    }
+
+    function buscarPlu() {
+        // Buscamos en los productos que vienen del inventario
+        let p = PRODUCTOS_INVENTARIO.find(x => x.codigo == document.getElementById('plu').value);
+        if(p) { pSel = p; document.getElementById('nom').value = p.nombre; }
+    }
+
+    function buscarNombre() {
+        let val = document.getElementById('nom').value.toLowerCase();
+        let res = document.getElementById('res'); res.innerHTML = "";
+        if(!val) return;
+        PRODUCTOS_INVENTARIO.filter(x => x.nombre.toLowerCase().includes(val)).forEach(p => {
+            let d = document.createElement('div'); d.className = "item-row";
+            d.innerHTML = `<span>${p.nombre}</span> <b>${fmt(p.precio)}</b>`;
+            d.onclick = () => { pSel = p; document.getElementById('nom').value = p.nombre; document.getElementById('plu').value = p.codigo; res.innerHTML = ""; };
+            res.appendChild(d);
+        });
+    }
+
+    function agregar() {
+        let n = parseInt(document.getElementById('cant').value);
+        if(!pSel || n <= 0) return alert("Selección o cantidad inválida");
+        let item = { uid: Date.now(), nombre: pSel.nombre, precio: pSel.precio, cant: n, sub: pSel.precio * n, hora: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) };
+        if(modo === 'rapido') carritoR.push(item);
+        else { if(!cActiva) return alert("Selecciona una cuenta"); cActiva.items.push(item); }
+        document.getElementById('plu').value = ""; document.getElementById('nom').value = ""; document.getElementById('cant').value = "0";
+        sync(); render();
+    }
+
+    function render() {
+        let list = modo === 'rapido' ? carritoR : (cActiva ? cActiva.items : []);
+        let cont = document.getElementById('listaCarrito'); cont.innerHTML = "";
+        let t = 0;
+        list.forEach(i => {
+            t += i.sub;
+            cont.innerHTML += `<div class="cart-item">
+                <span class="main-info"><b>${i.nombre}</b><span>${fmt(i.sub)}</span></span>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
+                    <span class="details">${i.cant} un. x ${fmt(i.precio)} | ${i.hora}</span>
+                    <button style="color:red; background:none; border:none; cursor:pointer; font-weight:700;" onclick="quitar(${i.uid})">QUITAR</button>
+                </div>
+            </div>`;
+        });
+        document.getElementById('totalTxt').innerText = fmt(t);
+        document.getElementById('cartTitle').innerText = modo === 'rapido' ? "Venta Rápida" : (cActiva ? "Cuenta: "+cActiva.nombre : "Seleccione Cuenta");
+        let chipCont = document.getElementById('chipsCuentas'); chipCont.innerHTML = "";
+        cuentas.forEach(c => {
+            let b = document.createElement('button'); b.className = "btn-modo"; b.style.width="auto"; b.style.padding="8px 15px";
+            if(cActiva && cActiva.id === c.id) b.classList.add('cuenta-on'); else b.classList.add('off');
+            b.innerText = "👤 " + c.nombre; b.onclick = () => { cActiva = c; setModo('cuenta'); };
+            chipCont.appendChild(b);
+        });
+    }
+
+    function setModo(m) {
+        modo = m;
+        document.getElementById('cardCuentas').style.display = m === 'cuenta' ? 'block' : 'none';
+        document.getElementById('modR').className = m === 'rapido' ? "btn-modo rapido-on" : "btn-modo off";
+        document.getElementById('modC').className = (m === 'cuenta' && cActiva) ? "btn-modo cuenta-on" : "btn-modo off";
+        render();
+    }
+
+    function crearCuenta() {
+        let n = document.getElementById('inputCliente').value.trim();
+        if(n) { let c = {id: Date.now(), nombre: n.toUpperCase(), items: []}; cuentas.push(c); cActiva = c; document.getElementById('inputCliente').value = ""; sync(); render(); }
+    }
+
+    function quitar(uid) {
+        if(modo === 'rapido') carritoR = carritoR.filter(x => x.uid !== uid);
+        else cActiva.items = cActiva.items.filter(x => x.uid !== uid);
+        sync(); render();
+    }
+
+    function abrirPago() {
+        let t = document.getElementById('totalTxt').innerText;
+        if(t === "$ 0") return alert("Carrito vacío");
+        document.getElementById('montoPago').innerText = t;
+        document.getElementById('modalPago').style.display = "flex";
+        document.getElementById('calcBox').style.display = "none";
+        metTemp = "";
+        document.querySelectorAll('.pay-btn').forEach(x => x.classList.remove('selected'));
+    }
+
+    function prepararMetodo(m) {
+        metTemp = m;
+        document.querySelectorAll('.pay-btn').forEach(x => x.classList.remove('selected'));
+        if(m === 'Efectivo') document.getElementById('payEfec').classList.add('selected');
+        if(m === 'Nequi') document.getElementById('payNeq').classList.add('selected');
+        if(m === 'Daviplata') document.getElementById('payDav').classList.add('selected');
+        document.getElementById('calcBox').style.display = m === 'Efectivo' ? "block" : "none";
+        if(m === 'Efectivo') { document.getElementById('pagaCon').value = ""; document.getElementById('vueltasTxt').innerText = "$ 0"; }
+    }
+
+    function calcularVueltas() {
+        let t = parseInt(document.getElementById('montoPago').innerText.replace(/[^0-9]/g, ""));
+        let p = parseInt(document.getElementById('pagaCon').value) || 0;
+        document.getElementById('vueltasTxt').innerText = fmt(p - t > 0 ? p - t : 0);
+    }
+
+    function procesarVenta() {
+        if(!metTemp) return alert("Seleccione método");
+        let list = modo === 'rapido' ? [...carritoR] : [...cActiva.items];
+        historial.unshift({ id: Date.now(), fecha: new Date().toLocaleDateString(), hora: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), cliente: modo === 'rapido' ? 'V.RÁPIDA' : cActiva.nombre, items: list, total: list.reduce((a, b) => a + b.sub, 0), metodo: metTemp });
+        if(modo === 'rapido') carritoR = []; else { cuentas = cuentas.filter(x => x.id !== cActiva.id); cActiva = null; }
+        document.getElementById('modalPago').style.display = "none";
+        sync(); render(); alert("Venta Exitosa");
+    }
+
+    function mostrarAuditoria() {
+        let hoy = new Date().toLocaleDateString();
+        let filtrado = historial.filter(x => x.fecha === hoy);
+        let ef = 0, nq = 0, dv = 0, deu = 0;
+        let body = document.getElementById('auditBody'); body.innerHTML = "";
+        filtrado.forEach(v => {
+            if(v.metodo === 'Efectivo') ef += v.total;
+            if(v.metodo === 'Nequi') nq += v.total;
+            if(v.metodo === 'Daviplata') dv += v.total;
+            v.items.forEach((prod, idx) => {
+                body.innerHTML += `<tr><td>${idx === 0 ? v.hora : ''}</td><td>${idx === 0 ? '<b>' + v.cliente + '</b>' : ''}</td><td>${prod.nombre}</td><td>${prod.cant}</td><td>${fmt(prod.precio)}</td><td><b>${fmt(prod.sub)}</b></td><td>${idx === 0 ? '<span class="status-badge bg-pagado">PAGADO</span>' : ''}</td></tr>`;
+            });
+        });
+        cuentas.forEach(c => {
+            let totalC = c.items.reduce((a, b) => a + b.sub, 0); deu += totalC;
+            c.items.forEach((prod, idx) => {
+                body.innerHTML += `<tr style="background:#fffafa"><td>Pend.</td><td>${idx === 0 ? '<b>' + c.nombre + '</b>' : ''}</td><td>${prod.nombre}</td><td>${prod.cant}</td><td>${fmt(prod.precio)}</td><td><b>${fmt(prod.sub)}</b></td><td>${idx === 0 ? '<span class="status-badge bg-deuda">DEUDA</span>' : ''}</td></tr>`;
+            });
+        });
+        document.getElementById('aEfec').innerText = fmt(ef);
+        document.getElementById('aNeq').innerText = fmt(nq);
+        document.getElementById('aDav').innerText = fmt(dv);
+        document.getElementById('aDeu').innerText = fmt(deu);
+        document.getElementById('modalAudit').style.display = "flex";
+    }
+
+    function cancelar() {
+        if(confirm("¿Borrar lista?")) {
+            if(modo === 'rapido') carritoR = []; else if(cActiva) { cuentas = cuentas.filter(x => x.id !== cActiva.id); cActiva = null; }
+            sync(); render();
+        }
+    }
+
+    setInterval(() => {
+        document.getElementById('reloj').innerText = new Date().toLocaleString();
+    }, 1000);
+    renderCaja(); render();
+</script>
+</body>
+</html>
