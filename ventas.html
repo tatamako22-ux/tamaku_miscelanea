@@ -6,7 +6,7 @@
     <title>TAMAKU - Ventas (Sincronizado)</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --blanco: #f5f5f5;
@@ -379,9 +379,16 @@
 </div>
 
 <script>
+    // --- CONEXIÓN SUPABASE ---
+    const supabaseUrl = 'https://xofaoaikrtldkvfifnub.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvZmFvYWlrcnRsZGt2ZmlmbnViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0ODc4ODYsImV4cCI6MjA5MTA2Mzg4Nn0.8QStNtgFGf6qStCJV9jmI8rxvEbDo-fcdOvhCOX9uNA';
+
+    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    // Ahora productos vienen de la nube
+    let PRODUCTOS_INVENTARIO = [];
     // --- CONEXIÓN CON INVENTARIO ---
     // Aquí está el truco: leemos la misma llave que usa el inventario
-    let PRODUCTOS_INVENTARIO = JSON.parse(localStorage.getItem('tamaku_productos')) || [];
 
     let historial = JSON.parse(localStorage.getItem('tk_hist')) || [];
     let cajaActiva = JSON.parse(localStorage.getItem('tk_caja')) || false;
@@ -410,15 +417,33 @@
     }
 
     function buscarPlu() {
-        // Buscamos en los productos que vienen del inventario
-        let p = PRODUCTOS_INVENTARIO.find(x => x.codigo == document.getElementById('plu').value);
-        if(p) { pSel = p; document.getElementById('nom').value = p.nombre; }
+    let codigoInput = document.getElementById('plu').value.trim();
+    let p = PRODUCTOS_INVENTARIO.find(x => String(x.codigo) === codigoInput);
+
+    if (p) {
+        pSel = p;
+        document.getElementById('nom').value = p.nombre;
+    } else {
+        pSel = null;
+        document.getElementById('nom').value = "";
     }
+}
 
     function buscarNombre() {
         let val = document.getElementById('nom').value.toLowerCase();
         let res = document.getElementById('res'); res.innerHTML = "";
-        if(!val) return;
+        if(!val) {
+            res.innerHTML = "";
+            return;
+        }
+        if(PRODUCTOS_INVENTARIO.length === 0){
+            res.innerHTML = `
+                <div class="item-row" style="justify-content:center; color:#999;">
+                    ⚠️ No tienes productos en inventario
+                </div>
+            `;
+            return;
+        }
         PRODUCTOS_INVENTARIO.filter(x => x.nombre.toLowerCase().includes(val)).forEach(p => {
             let d = document.createElement('div'); d.className = "item-row";
             d.innerHTML = `<span>${p.nombre}</span> <b>${fmt(p.precio)}</b>`;
@@ -430,6 +455,9 @@
     function agregar() {
         let n = parseInt(document.getElementById('cant').value);
         if(!pSel || n <= 0) return alert("Selección o cantidad inválida");
+        if (pSel.stock !== undefined && n > pSel.stock) {
+        return alert("⚠️ No hay suficiente stock");
+        }
         let item = { uid: Date.now(), nombre: pSel.nombre, precio: pSel.precio, cant: n, sub: pSel.precio * n, hora: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) };
         if(modo === 'rapido') carritoR.push(item);
         else { if(!cActiva) return alert("Selecciona una cuenta"); cActiva.items.push(item); }
@@ -482,8 +510,8 @@
     }
 
     function abrirPago() {
-        let t = document.getElementById('totalTxt').innerText;
-        if(t === "$ 0") return alert("Carrito vacío");
+        let t = parseInt(document.getElementById('totalTxt').innerText.replace(/[^0-9]/g, "")) || 0;
+        if(t <= 0) return alert("Carrito vacío");
         document.getElementById('montoPago').innerText = t;
         document.getElementById('modalPago').style.display = "flex";
         document.getElementById('calcBox').style.display = "none";
@@ -552,7 +580,40 @@
     setInterval(() => {
         document.getElementById('reloj').innerText = new Date().toLocaleString();
     }, 1000);
-    renderCaja(); render();
+    async function iniciarApp(){
+    await cargarProductosDesdeNube();
+    renderCaja();
+    render();
+}
+
+iniciarApp();
+    async function cargarProductosDesdeNube() {
+    const { data, error } = await _supabase
+        .from('productos')
+        .select('*');
+
+    if (error) {
+        console.error("Error cargando productos:", error);
+        alert("Error conectando con inventario");
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        console.warn("No hay productos en la base de datos");
+        alert("⚠️ No tienes productos en inventario");
+        return;
+    }
+
+    PRODUCTOS_INVENTARIO = data.map(p => ({
+    codigo: p.codigo,
+    nombre: p.nombre,
+    precio: p.precio_venta,
+    stock: p.stock
+    }));
+
+    console.log("Productos cargados:", PRODUCTOS_INVENTARIO);
+}
+
 </script>
 </body>
 </html>
