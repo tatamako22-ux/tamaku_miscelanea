@@ -5,96 +5,98 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TAMAKU - Inventario Cloud Pro</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         :root {
-            --blanco: #f5f5f5;
-            --negro: #111111;
-            --dorado: #d4af37;
-            --gris-claro: #eaeaea;
-            --verde: #27ae60;
-            --rojo: #e74c3c;
-            --azul: #3498db;
+            --blanco: #ffffff;
+            --negro: #0a0a0a;
+            --dorado-brillo: #fdfc97;
+            --dorado-medio: #d4af37;
+            --dorado-oscuro: #a67c00;
+            --dorado-shadow: rgba(166, 124, 0, 0.4);
+            --gris-fondo: #f5f5f7;
+            --azul: #007aff;
+            --verde: #28cd41;
+            --rojo: #ff3b30;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(212, 175, 55, 0.2);
+            --font-main: 'Poppins', sans-serif;
         }
 
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: var(--font-main);
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background: linear-gradient(135deg, #f5f5f5, #eaeaea);
+            background: linear-gradient(135deg, #f5f5f7 0%, #e2e2e7 100%);
             height: 100vh;
             display: flex;
             overflow: hidden;
+            color: var(--negro);
         }
 
-        .app {
-            display: flex;
-            width: 100%;
-            height: 100vh;
-        }
+        .app { display: flex; width: 100%; height: 100vh; }
 
-        /* --- SIDEBAR --- */
+        /* --- SIDEBAR LUXURY (260px) --- */
         .sidebar {
-            width: 240px;
-            background: #fff;
-            border-right: 1px solid #ddd;
-            padding: 20px;
+            width: 260px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            padding: 30px 20px;
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
+            z-index: 100;
         }
 
-        .logo { font-size: 22px; font-weight: 700; color: var(--dorado); }
-        .sub { font-size: 11px; color: #777; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px;}
+        .logo-container { text-align: center; margin-bottom: 30px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; }
+        .logo { 
+            font-size: 26px; font-weight: 800; 
+            background: linear-gradient(to bottom, var(--dorado-brillo), var(--dorado-oscuro));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+        .sub-logo { font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; }
 
         .menu { flex: 1; }
         .menu button {
-            width: 100%;
-            padding: 14px;
-            margin-bottom: 10px;
-            border: none;
-            border-radius: 12px;
-            background: var(--gris-claro);
-            cursor: pointer;
-            transition: 0.3s;
-            text-align: left;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #555;
+            width: 100%; padding: 14px 18px; margin-bottom: 10px;
+            border: 1px solid transparent; border-radius: 16px;
+            background: transparent; cursor: pointer; transition: all 0.3s;
+            text-align: left; font-weight: 600; color: #444;
+            display: flex; align-items: center; gap: 12px;
         }
-
         .menu button.activo {
-            background: var(--dorado);
-            color: #fff;
+            color: var(--negro);
+            background: linear-gradient(135deg, var(--dorado-brillo), var(--dorado-medio), var(--dorado-oscuro));
+            box-shadow: 0 10px 20px var(--dorado-shadow);
+            border: 1px solid var(--dorado-oscuro);
         }
 
-        /* --- CONTENIDO --- */
+        /* --- CONTENIDO PRINCIPAL --- */
+        .main-container { flex: 1; display: flex; overflow: hidden; }
         .content {
             flex: 1;
-            padding: 25px;
+            padding: 30px;
             overflow-y: auto;
-            background: #fdfdfd;
+            -webkit-overflow-scrolling: touch;
         }
 
-        h2 { font-weight: 700; color: #333; margin-bottom: 20px; font-size: 24px; }
+        h2 { font-weight: 800; font-size: 28px; margin-bottom: 25px; letter-spacing: -1px; color: #1a1a1a; }
 
         /* --- CARD REGISTRO --- */
         .card {
-            background: #fff;
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            background: var(--blanco);
+            padding: 30px;
+            border-radius: 24px;
             margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
             border: 1px solid rgba(0,0,0,0.02);
         }
 
@@ -106,323 +108,261 @@
         }
 
         .input-group { display: flex; flex-direction: column; gap: 8px; }
-        .label-text { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; }
+        .label-text { font-size: 11px; font-weight: 800; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
 
         input {
-            padding: 14px;
-            border-radius: 12px;
-            border: 2px solid #eee;
-            outline: none;
-            font-size: 14px;
-            background: #fafafa;
-            width: 100%;
-            transition: 0.3s;
+            width: 100%; padding: 14px; border-radius: 12px;
+            border: 2px solid #eee; background: #fafafa;
+            font-size: 14px; outline: none; transition: 0.3s;
         }
-        input:focus { border-color: var(--dorado); background: #fff; }
+        input:focus { border-color: var(--dorado-medio); background: #fff; }
 
-        /* --- BOTÓN GUARDAR CORREGIDO --- */
         .btn-save {
-            background: var(--dorado);
-            color: white;
-            padding: 14px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s;
-            width: 100%;
-            font-size: 14px;
-            display: block;
-            text-transform: uppercase;
-            box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);
+            background: var(--dorado-medio);
+            color: white; padding: 16px; border: none; border-radius: 12px;
+            font-weight: 800; cursor: pointer; transition: 0.2s;
+            text-transform: uppercase; font-size: 13px;
+            box-shadow: 0 4px 10px var(--dorado-shadow);
         }
         .btn-save:active { transform: scale(0.96); }
-        .btn-save:hover { background: #b8962d; }
+        .btn-save:hover { background: var(--dorado-oscuro); }
 
         /* --- TABLA --- */
         .table-container {
-            background: white;
-            border-radius: 20px;
-            padding: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            overflow-x: auto;
+            background: white; border-radius: 24px; padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03); overflow-x: auto;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 900px;
-        }
-
-        th {
-            text-align: left;
-            padding: 15px;
-            border-bottom: 2px solid #eee;
-            color: #aaa;
-            text-transform: uppercase;
-            font-size: 10px;
-        }
-
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #f1f1f1;
-            font-size: 13px;
-        }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { text-align: left; padding: 15px; border-bottom: 2px solid #f5f5f7; color: #aaa; font-size: 10px; text-transform: uppercase; font-weight: 800; }
+        td { padding: 15px; border-bottom: 1px solid #f9f9fb; font-size: 13px; color: #444; }
 
         .ganancia-txt { color: var(--verde); font-weight: 700; }
 
-        /* --- RESPONSIVE IPHONE --- */
-        @media (max-width: 768px) {
-            .app { flex-direction: column; height: auto; overflow: auto; }
-            .sidebar {
-                width: 100%; height: auto; padding: 10px;
-                flex-direction: row; justify-content: space-around;
-                position: sticky; top: 0; z-index: 1500; border-right: none; border-bottom: 1px solid #ddd;
-            }
-            .sidebar .logo, .sidebar .sub { display: none; }
-            .menu { display: flex; gap: 5px; width: 100%; overflow-x: auto; padding-bottom: 5px; }
-            .menu button { margin-bottom: 0; font-size: 11px; padding: 12px 15px; white-space: nowrap; width: auto; }
-
-            .content { padding: 15px; height: auto; overflow: visible; }
-            .grid-form { 
-                grid-template-columns: 1fr 1fr; 
-                gap: 12px; 
-            }
-            .grid-form .input-group:nth-child(2) { grid-column: span 2; }
-            .btn-save { 
-                grid-column: span 2; 
-                padding: 16px; 
-                font-size: 16px; 
-                margin-top: 10px; 
-            }
-        }
-        .toast {
-            min-width: 250px;
-            padding: 15px 18px;
-            border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            animation: slideIn 0.4s ease;
-        }
-
-        .toast.success { background: #27ae60; }
-        .toast.error { background: #e74c3c; }
+        /* --- TOASTS & MODALS --- */
+        #toastBox { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { min-width: 250px; padding: 15px 20px; border-radius: 12px; color: white; font-weight: 700; box-shadow: 0 10px 25px rgba(0,0,0,0.1); animation: slideIn 0.4s ease; }
+        .toast.success { background: var(--verde); }
+        .toast.error { background: var(--rojo); }
         .toast.warn { background: #f39c12; }
 
-        @keyframes slideIn {
-            from { transform: translateX(120%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        .modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 9998; }
+        .modal { background: #fff; padding: 30px; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-actions button { flex: 1; padding: 12px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; }
+        .btn-cancel { background: #eee; }
+        .btn-confirm { background: var(--rojo); color: white; }
+
+        /* --- TABBAR (MOVIL) --- */
+        .tabbar {
+            display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 85px;
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(25px);
+            border-top: 1px solid var(--glass-border); justify-content: space-around;
+            padding-bottom: env(safe-area-inset-bottom); z-index: 1000;
         }
-        /* --- MODAL PRO --- */
-        .modal-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9998;
-            animation: fadeIn 0.3s ease;
+        .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: #999; font-size: 10px; font-weight: 700; }
+        .tab-item.activo { color: var(--dorado-oscuro); }
+        .tab-item .icon { font-size: 22px; margin-bottom: 2px; }
+
+        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .tabbar { display: flex; }
+            .content { padding: 20px; padding-bottom: 110px; }
+            .grid-form { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .grid-form .input-group:nth-child(2) { grid-column: span 2; }
+            .btn-save { grid-column: span 2; }
+        }
+        /* --- DASHBOARD CARDS --- */
+        .dashboard-resumen {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
         }
 
-        .modal {
-            background: #fff;
-            padding: 25px;
+        .kpi-card {
+            background: white;
+            padding: 20px;
             border-radius: 20px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            animation: scaleIn 0.3s ease;
-        }
-
-        .modal h3 {
-            margin-bottom: 10px;
-        }
-
-        .modal p {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 20px;
-        }
-
-        .modal-actions {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+            border: 1px solid rgba(212, 175, 55, 0.1);
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            gap: 5px;
         }
 
-        .modal-actions button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn-cancel {
-            background: #eee;
-        }
-
-        .btn-confirm {
-            background: var(--rojo);
-            color: white;
-        }
-
-        @keyframes fadeIn {
-            from {opacity: 0;}
-            to {opacity: 1;}
-        }
-
-        @keyframes scaleIn {
-            from {transform: scale(0.8); opacity: 0;}
-            to {transform: scale(1); opacity: 1;}
-        }
+        .kpi-title { font-size: 11px; font-weight: 800; color: #999; text-transform: uppercase; letter-spacing: 1px; }
+        .kpi-value { font-size: 20px; font-weight: 800; color: var(--negro); }
+        .kpi-icon { font-size: 24px; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
 <div class="app">
     <div class="sidebar">
-        <div>
+        <div class="logo-container">
             <div class="logo">TAMAKU</div>
-            <div class="sub">Miscelánea & Cloud</div>
+            <div class="sub-logo">Luxury Business Pro</div>
         </div>
-
         <div class="menu">
-            <button onclick="location.href='index.html'">🏠 Inicio</button>
-            <button onclick="location.href='ventas.html'">💰 Ventas</button>
-            <button class="activo">📦 Inventario</button>
-            <button onclick="alert('Próximamente')">➕ Agregar</button>
-            <button onclick="alert('Próximamente')">📊 Reportes</button>
+            <button onclick="location.href='index.html'"><span>🏠</span> Inicio</button>
+            <button onclick="location.href='ventas.html'"><span>💰</span> Ventas</button>
+            <button class="activo"><span>📦</span> Inventario</button>
+            <button onclick="location.href='cierres.html'"><span>🧾</span> Cierres</button>
+            <button onclick="alert('Próximamente')"><span>📊</span> Reportes</button>
         </div>
     </div>
 
-    <div class="content">
-        <h2>Inventario Cloud Profesional</h2>
-
-        <div class="card">
-            <h3 style="margin-bottom: 20px; font-size: 16px; color: #555;">📥 Registro de Productos</h3>
-            <h3 id="modoEdicionTxt" style="margin-bottom:10px; color:#999;">
-                Modo: Nuevo Producto
-            </h3>
-            <div class="grid-form">
-                <div class="input-group">
-                    <span class="label-text">PLU (Cód)</span>
-                    <input type="number" id="cod" placeholder="1">
+    <div class="main-container">
+        <div class="content">
+            <h2>Inventario Cloud Pro</h2>
+            <div class="dashboard-resumen">
+                <div class="kpi-card">
+                    <span class="kpi-icon">🏛️</span>
+                    <span class="kpi-title">Valor del Inventario</span>
+                    <span class="kpi-value" id="totalInventario">$ 0</span>
                 </div>
-                <div class="input-group">
-                    <span class="label-text">Nombre del Producto</span>
-                    <input type="text" id="nom" placeholder="Ej: Poker en lata">
+                <div class="kpi-card">
+                    <span class="kpi-icon">📈</span>
+                    <span class="kpi-title">Ganancia Proyectada</span>
+                    <span class="kpi-value" id="totalGanancia" style="color: var(--verde);">$ 0</span>
                 </div>
-                <div class="input-group">
-                    <span class="label-text">Existencia</span>
-                    <input type="number" id="stock" placeholder="0">
-                </div>
-                <div class="input-group">
-                    <span class="label-text">Costo Mayor</span>
-                    <input type="number" id="costo" placeholder="$" oninput="calcularPreview()">
-                </div>
-                <div class="input-group">
-                    <span class="label-text">% Ganancia</span>
-                    <input type="number" id="porcentaje" placeholder="%" oninput="calcularPreview()">
-                </div>
-                <div class="input-group" style="grid-column: span 2;">
-                <span class="label-text">Vista previa</span>
-                <div id="previewGanancia" style="padding:12px; border-radius:12px; background:#f4f4f4; font-weight:600;">
-                    Utilidad: $ 0 | Venta: $ 0
+                <div class="kpi-card">
+                    <span class="kpi-icon">📦</span>
+                    <span class="kpi-title">Total Unidades</span>
+                    <span class="kpi-value" id="totalUnidades">0 un.</span>
                 </div>
             </div>
-                <div class="input-group" style="grid-column: span 2; width: 100%;">
-                    <button class="btn-save" onclick="guardarEnSupabase()">GUARDAR PRODUCTO</button>
+
+            <div class="card">
+                <h3 style="margin-bottom: 20px; font-size: 15px; color: #555;">📥 Registro de Productos</h3>
+                <h3 id="modoEdicionTxt" style="margin-bottom:15px; color:#999; font-size: 12px;">Modo: Nuevo Producto</h3>
+                
+                <div class="grid-form">
+                    <div class="input-group">
+                        <span class="label-text">PLU (Cód)</span>
+                        <input type="number" id="cod" placeholder="1">
+                    </div>
+                    <div class="input-group">
+                        <span class="label-text">Nombre del Producto</span>
+                        <input type="text" id="nom" placeholder="EJ: POKER EN LATA" style="text-transform: uppercase;">
+                    </div>
+                    <div class="input-group">
+                        <span class="label-text">Existencia</span>
+                        <input type="number" id="stock" placeholder="0">
+                    </div>
+                    <div class="input-group">
+                        <span class="label-text">Costo Mayor</span>
+                        <input type="number" id="costo" placeholder="$" oninput="calcularPreview()">
+                    </div>
+                    <div class="input-group">
+                        <span class="label-text">% Ganancia</span>
+                        <input type="number" id="porcentaje" placeholder="%" oninput="calcularPreview()">
+                    </div>
+                    
+                    <div class="input-group" style="grid-column: span 3;">
+                        <span class="label-text">Vista Previa de Utilidad</span>
+                        <div id="previewGanancia" style="padding:15px; border-radius:12px; background:#f4f4f4; font-weight:600; font-size: 13px;">
+                            Utilidad: $ 0 | Venta: $ 0
+                        </div>
+                    </div>
+                    
+                    <div class="input-group" style="grid-column: span 2;">
+                        <button class="btn-save" onclick="guardarEnSupabase()">GUARDAR PRODUCTO</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Cód</th>
-                        <th>Producto</th>
-                        <th>Stock</th>
-                        <th>Costo Mayor</th>
-                        <th>Venta Sugerida</th>
-                        <th>Utilidad Unit.</th>
-                        <th>Utilidad Total</th>
-                        <th>Acción</th>
-                    </tr>
-                </thead>
-                <tbody id="listaProductosBody"></tbody>
-            </table>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cód</th>
+                            <th>Producto</th>
+                            <th>Stock</th>
+                            <th>Costo Mayor</th>
+                            <th>Venta Sugerida</th>
+                            <th>Utilidad Unit.</th>
+                            <th>Utilidad Total</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaProductosBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
+
+    <nav class="tabbar">
+        <a href="index.html" class="tab-item">
+            <span class="icon">🏠</span><span>Inicio</span>
+        </a>
+        <a href="ventas.html" class="tab-item">
+            <span class="icon">💰</span><span>Ventas</span>
+        </a>
+        <a href="inventario.html" class="tab-item activo">
+            <span class="icon">📦</span><span>Stock</span>
+        </a>
+        <a href="cierres.html" class="tab-item">
+            <span class="icon">🧾</span><span>Cierres</span>
+        </a>
+    </nav>
 </div>
 
+<div id="toastBox"></div>
+<div id="modalContainer"></div>
+
 <script>
-    // --- CONFIGURACIÓN DE CONEXIÓN REAL ---
     const supabaseUrl = 'https://xofaoaikrtldkvfifnub.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvZmFvYWlrcnRsZGt2ZmlmbnViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0ODc4ODYsImV4cCI6MjA5MTA2Mzg4Nn0.8QStNtgFGf6qStCJV9jmI8rxvEbDo-fcdOvhCOX9uNA';
-    
-    // Inicialización del cliente
     const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
     const fmt = (n) => "$ " + Math.round(n || 0).toLocaleString('es-CO');
+    let paginaActual = 1;
+    const productosPorPagina = 10;
+    let listaCompletaProductos = [];
+
     function mostrarToast(msg, tipo = "success") {
-    const box = document.getElementById('toastBox');
+        const box = document.getElementById('toastBox');
+        const toast = document.createElement('div');
+        toast.className = "toast " + tipo;
+        toast.innerText = msg;
+        box.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = "0";
+            toast.style.transform = "translateX(120%)";
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
 
-    const toast = document.createElement('div');
-    toast.className = "toast " + tipo;
-    toast.innerText = msg;
-
-    box.appendChild(toast);
-
-    setTimeout(() => {
-        toast.style.opacity = "0";
-        toast.style.transform = "translateX(120%)";
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-function mostrarModal(titulo, mensaje, onConfirm) {
-    const container = document.getElementById('modalContainer');
-
-    container.innerHTML = `
-        <div class="modal-bg">
-            <div class="modal">
-                <h3>${titulo}</h3>
-                <p>${mensaje}</p>
-                <div class="modal-actions">
-                    <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
-                    <button class="btn-confirm" onclick="confirmarModal()">Confirmar</button>
+    function mostrarModal(titulo, mensaje, onConfirm) {
+        const container = document.getElementById('modalContainer');
+        container.innerHTML = `
+            <div class="modal-bg">
+                <div class="modal">
+                    <h3>${titulo}</h3>
+                    <p>${mensaje}</p>
+                    <div class="modal-actions">
+                        <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+                        <button class="btn-confirm" onclick="confirmarModal()">Confirmar</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    `;
-
-    window._modalConfirm = onConfirm;
-}
-
-    function cerrarModal() {
-        document.getElementById('modalContainer').innerHTML = "";
+        `;
+        window._modalConfirm = onConfirm;
     }
 
-    function confirmarModal() {
-        if (window._modalConfirm) window._modalConfirm();
-        cerrarModal();
-    }
+    function cerrarModal() { document.getElementById('modalContainer').innerHTML = ""; }
+    function confirmarModal() { if (window._modalConfirm) window._modalConfirm(); cerrarModal(); }
+
     function generarSiguienteCodigo(lista) {
-    if (!lista || lista.length === 0) return 1;
+        if (!lista || lista.length === 0) return 1;
+        const codigos = lista.map(p => p.codigo);
+        return Math.max(...codigos) + 1;
+    }
 
-    const codigos = lista.map(p => p.codigo);
-    const max = Math.max(...codigos);
-
-    return max + 1;
-}
-
-    // --- CARGAR PRODUCTOS ---
     async function cargarDesdeNube() {
         try {
             const { data, error } = await _supabase
@@ -431,25 +371,44 @@ function mostrarModal(titulo, mensaje, onConfirm) {
                 .order('codigo', { ascending: true });
 
             if (error) throw error;
-            renderTabla(data);
-            // Generar siguiente código automático
-            const siguiente = generarSiguienteCodigo(data);
-            if (!document.getElementById('cod').value) {
-                if (!document.getElementById('cod').value) {
-            document.getElementById('cod').value = siguiente;
-        }
+            
+            listaCompletaProductos = data; 
+            
+            // --- CÁLCULO DE TOTALES PARA EL DASHBOARD ---
+            actualizarDashboard(data);
+            
+            renderTablaPaginada(); 
+            
+            if (!document.getElementById('cod').disabled) {
+                document.getElementById('cod').value = generarSiguienteCodigo(data);
             }
         } catch (err) {
             console.error("Error al conectar:", err);
-            // Aviso más amigable
-            console.log("No se pudo conectar a Supabase. Verifica tu conexión o políticas RLS.");
+            mostrarToast("❌ Error al cargar datos de la nube", "error");
         }
     }
 
-    // --- GUARDAR O ACTUALIZAR ---
+    function actualizarDashboard(data) {
+        let sumaInversion = 0;
+        let sumaGanancia = 0;
+        let sumaUnidades = 0;
+
+        data.forEach(p => {
+            sumaInversion += (p.costo_mayor * p.stock);
+            sumaGanancia += (p.ganancia_proyectada || 0);
+            sumaUnidades += (p.stock || 0);
+        });
+
+        document.getElementById('totalInventario').innerText = fmt(sumaInversion);
+        document.getElementById('totalGanancia').innerText = fmt(sumaGanancia);
+        document.getElementById('totalUnidades').innerText = sumaUnidades + " un.";
+    }
+
     async function guardarEnSupabase() {
         const cod = parseInt(document.getElementById('cod').value);
-        const nom = document.getElementById('nom').value.trim().toUpperCase();
+        let nomInput = document.getElementById('nom');
+        const nom = nomInput.value.trim().toUpperCase();
+        nomInput.value = nom; // Esto limpia el espacio en blanco visualmente también
         const stk = parseInt(document.getElementById('stock').value) || 0;
         const cst = parseInt(document.getElementById('costo').value) || 0;
         const por = parseInt(document.getElementById('porcentaje').value) || 0;
@@ -458,17 +417,7 @@ function mostrarModal(titulo, mensaje, onConfirm) {
             mostrarToast("⚠️ Ingresa código y nombre", "warn");
             return;
         }
-        // Validar si el código ya existe
-        const { data: existente } = await _supabase
-            .from('productos')
-            .select('*')
-            .eq('codigo', cod)
-            .maybeSingle();
 
-        if (existente) {
-            const confirmar = confirm("⚠️ Este código ya existe. ¿Deseas actualizarlo?");
-            if (!confirmar) return;
-        }
         const utilidadUnitaria = cst * (por / 100);
         const pVenta = cst + utilidadUnitaria;
         const gTotal = utilidadUnitaria * stk;
@@ -487,7 +436,6 @@ function mostrarModal(titulo, mensaje, onConfirm) {
                 }, { onConflict: 'codigo' });
 
             if (error) throw error;
-
             mostrarToast("✅ Producto guardado correctamente", "success");
             limpiarCampos();
             cargarDesdeNube();
@@ -496,30 +444,27 @@ function mostrarModal(titulo, mensaje, onConfirm) {
         }
     }
 
-    // --- ELIMINAR ---
     async function borrarProducto(codigo) {
-    mostrarModal(
-        "Eliminar producto",
-        "¿Seguro que deseas eliminar este producto?",
-        async () => {
-            try {
-                const { error } = await _supabase
-                    .from('productos')
-                    .delete()
-                    .eq('codigo', codigo);
+        mostrarModal(
+            "Eliminar producto",
+            "¿Seguro que deseas eliminar este producto permanentemente?",
+            async () => {
+                try {
+                    const { error } = await _supabase
+                        .from('productos')
+                        .delete()
+                        .eq('codigo', codigo);
 
-                if (error) throw error;
-
-                mostrarToast("🗑️ Producto eliminado", "success");
-                cargarDesdeNube();
-            } catch (err) {
-                mostrarToast("❌ Error al eliminar", "error");
+                    if (error) throw error;
+                    mostrarToast("🗑️ Producto eliminado", "success");
+                    cargarDesdeNube();
+                } catch (err) {
+                    mostrarToast("❌ Error al eliminar", "error");
+                }
             }
-        }
-    );
-}
+        );
+    }
 
-    // --- RENDERIZAR TABLA ---
     function renderTabla(lista) {
         const cont = document.getElementById('listaProductosBody');
         cont.innerHTML = "";
@@ -528,7 +473,7 @@ function mostrarModal(titulo, mensaje, onConfirm) {
             const utilUnit = p.precio_venta - p.costo_mayor;
             cont.innerHTML += `
                 <tr>
-                    <td><b style="background:#eee; padding:5px 10px; border-radius:5px;">${p.codigo}</b></td>
+                    <td><b style="background:#f0f0f0; padding:5px 10px; border-radius:8px;">${p.codigo}</b></td>
                     <td><b>${p.nombre}</b></td>
                     <td>${p.stock} un.</td>
                     <td>${fmt(p.costo_mayor)}</td>
@@ -536,103 +481,173 @@ function mostrarModal(titulo, mensaje, onConfirm) {
                     <td style="color:var(--verde)">+ ${fmt(utilUnit)}</td>
                     <td class="ganancia-txt">${fmt(p.ganancia_proyectada)}</td>
                     <td>
-                    <button onclick="editarProducto(${p.codigo})"
-                        style="margin-right:5px; background:none; border:none; color:var(--azul); cursor:pointer; font-weight:bold;">
-                        ✏️
-                    </button>
-
-                    <button onclick="borrarProducto(${p.codigo})"
-                        style="background:none; border:none; color:var(--rojo); cursor:pointer; font-weight:bold; font-size:18px;">
-                        ✕
-                    </button>
-                </td>
+                        <button onclick="editarProducto(${p.codigo})"
+                            style="margin-right:10px; background:none; border:none; cursor:pointer; font-size:16px;">
+                            ✏️
+                        </button>
+                        <button onclick="borrarProducto(${p.codigo})"
+                            style="background:none; border:none; color:var(--rojo); cursor:pointer; font-size:16px;">
+                            ✕
+                        </button>
+                    </td>
                 </tr>
             `;
         });
     }
+    function renderTablaPaginada() {
+    const cont = document.getElementById('listaProductosBody');
+    cont.innerHTML = "";
+    
+    // Calculamos el corte de la lista
+    const inicio = (paginaActual - 1) * productosPorPagina;
+    const fin = inicio + productosPorPagina;
+    const productosVisibles = listaCompletaProductos.slice(inicio, fin);
 
-    function limpiarCampos() {
-    document.getElementById('nom').value = "";
-    document.getElementById('stock').value = "";
-    document.getElementById('costo').value = "";
-    document.getElementById('porcentaje').value = "";
+    productosVisibles.forEach(p => {
+        const utilUnit = p.precio_venta - p.costo_mayor;
+        cont.innerHTML += `
+            <tr>
+                <td><b style="background:#f0f0f0; padding:5px 10px; border-radius:8px;">${p.codigo}</b></td>
+                <td><b>${p.nombre}</b></td>
+                <td>${p.stock} un.</td>
+                <td>${fmt(p.costo_mayor)}</td>
+                <td style="color:var(--azul); font-weight:700;">${fmt(p.precio_venta)}</td>
+                <td style="color:var(--verde)">+ ${fmt(utilUnit)}</td>
+                <td class="ganancia-txt">${fmt(p.ganancia_proyectada)}</td>
+                <td>
+                    <button onclick="editarProducto(${p.codigo})" style="margin-right:10px; background:none; border:none; cursor:pointer; font-size:16px;">✏️</button>
+                    <button onclick="borrarProducto(${p.codigo})" style="background:none; border:none; color:var(--rojo); cursor:pointer; font-size:16px;">✕</button>
+                </td>
+            </tr>
+        `;
+    });
 
-    document.getElementById('modoEdicionTxt').innerText = "Modo: Nuevo Producto";
-    document.getElementById('previewGanancia').innerText = "Utilidad: $ 0 | Venta: $ 0";
-    // volver a generar código automático
-    cargarDesdeNube();
+    // Agregar botones de paginación debajo de la tabla
+    agregarControlesPaginacion();
 }
-    function editarProducto(codigo) {
-    _supabase
-        .from('productos')
-        .select('*')
-        .eq('codigo', codigo)
-        .single()
-        .then(({ data, error }) => {
-            if (error) {
-                mostrarToast("❌ Error al cargar producto", "error");
-                return;
-            }
 
-            document.getElementById('modoEdicionTxt').innerText = "✏️ Editando producto";
-
-            document.getElementById('cod').value = data.codigo;
-            document.getElementById('cod').disabled = true;
-            document.getElementById('nom').value = data.nombre;
-            document.getElementById('stock').value = data.stock;
-            document.getElementById('costo').value = data.costo_mayor;
-            document.getElementById('porcentaje').value = data.porcentaje_ganancia;
-            calcularPreview();
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-}
-function calcularPreview() {
-    const costo = parseFloat(document.getElementById('costo').value) || 0;
-    const porcentaje = parseFloat(document.getElementById('porcentaje').value) || 0;
-
-    const utilidad = costo * (porcentaje / 100);
-    const venta = costo + utilidad;
-
-    let estado = "";
-    let color = "";
-
-    if (porcentaje < 20) {
-        estado = "⚠️ Ganancia baja";
-        color = "#e74c3c";
-    } else if (porcentaje >= 20 && porcentaje < 40) {
-        estado = "🟡 Ganancia media";
-        color = "#f1c40f";
-    } else {
-        estado = "🟢 Buena ganancia";
-        color = "#27ae60";
+function agregarControlesPaginacion() {
+    const totalPaginas = Math.ceil(listaCompletaProductos.length / productosPorPagina);
+    if (totalPaginas <= 1) {
+        const viejo = document.getElementById('paginacionControles');
+        if (viejo) viejo.remove();
+        return;
     }
 
-    // sugerencia automática
-    const sugerido = costo * 1.3; // 30% recomendado
+    let controlesHtml = `
+        <div style="margin-top:25px; display:flex; justify-content:center; gap:10px; align-items:center; padding: 10px;">
+            <button onclick="cambiarPagina(-1)" ${paginaActual === 1 ? 'disabled' : ''} 
+                style="padding:10px 20px; border-radius:12px; border:1px solid var(--dorado-oscuro); background:${paginaActual === 1 ? '#eee' : 'white'}; cursor:pointer; font-weight:700; transition:0.3s;">
+                ← 
+            </button>
+            
+            <div style="background:var(--dorado-medio); color:white; padding:8px 15px; border-radius:12px; font-weight:800; font-size:12px; box-shadow:0 4px 10px var(--dorado-shadow);">
+                PÁGINA ${paginaActual} / ${totalPaginas}
+            </div>
 
-    const box = document.getElementById('previewGanancia');
-    box.style.color = color;
-
-    box.innerHTML = `
-        Utilidad: <b>${fmt(utilidad)}</b><br>
-        Venta: <b>${fmt(venta)}</b><br>
-        <small>${estado}</small><br>
-        <small>💡 Sugerido (30%): ${fmt(sugerido)}</small>
+            <button onclick="cambiarPagina(1)" ${paginaActual === totalPaginas ? 'disabled' : ''} 
+                style="padding:10px 20px; border-radius:12px; border:1px solid var(--dorado-oscuro); background:${paginaActual === totalPaginas ? '#eee' : 'white'}; cursor:pointer; font-weight:700; transition:0.3s;">
+                →
+            </button>
+        </div>
     `;
+    
+    const viejo = document.getElementById('paginacionControles');
+    if (viejo) viejo.remove();
+    
+    const div = document.createElement('div');
+    div.id = 'paginacionControles';
+    div.innerHTML = controlesHtml;
+    document.querySelector('.table-container').appendChild(div);
 }
+
+function cambiarPagina(direccion) {
+    paginaActual += direccion;
+    renderTablaPaginada();
+}
+
+    function editarProducto(codigo) {
+        _supabase
+            .from('productos')
+            .select('*')
+            .eq('codigo', codigo)
+            .single()
+            .then(({ data, error }) => {
+                if (error) {
+                    mostrarToast("❌ Error al cargar producto", "error");
+                    return;
+                }
+                // Llenar datos
+                document.getElementById('modoEdicionTxt').innerText = "✏️ EDITANDO: " + data.nombre;
+                document.getElementById('modoEdicionTxt').style.color = "var(--azul)";
+                document.getElementById('cod').value = data.codigo;
+                document.getElementById('cod').disabled = true;
+                document.getElementById('nom').value = data.nombre.toUpperCase();
+                document.getElementById('stock').value = data.stock;
+                document.getElementById('costo').value = data.costo_mayor;
+                document.getElementById('porcentaje').value = data.porcentaje_ganancia;
+
+                // Cambio visual del botón
+                const btn = document.querySelector('.btn-save');
+                btn.innerText = "ACTUALIZAR PRODUCTO";
+                btn.style.background = "var(--azul)";
+
+                calcularPreview();
+                
+                // Salto automático al formulario
+                document.getElementById('modoEdicionTxt').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                mostrarToast("Producto listo para editar", "success");
+            });
+    }
+
+    function limpiarCampos() {
+        document.getElementById('nom').value = "";
+        document.getElementById('stock').value = "";
+        document.getElementById('costo').value = "";
+        document.getElementById('porcentaje').value = "";
+        document.getElementById('cod').disabled = false;
+        document.getElementById('modoEdicionTxt').innerText = "Modo: Nuevo Producto";
+        document.getElementById('modoEdicionTxt').style.color = "#999";
+        
+        // Restaurar botón original
+        const btn = document.querySelector('.btn-save');
+        btn.innerText = "GUARDAR PRODUCTO";
+        btn.style.background = "var(--dorado-medio)";
+        
+        document.getElementById('previewGanancia').innerText = "Utilidad: $ 0 | Venta: $ 0";
+    }
+
+    function calcularPreview() {
+        const costo = parseFloat(document.getElementById('costo').value) || 0;
+        const porcentaje = parseFloat(document.getElementById('porcentaje').value) || 0;
+        const utilidad = costo * (porcentaje / 100);
+        const venta = costo + utilidad;
+        const sugerido = costo * 1.3;
+
+        let estado = "";
+        let color = "";
+
+        if (porcentaje < 20) {
+            estado = "⚠️ Ganancia baja";
+            color = "#ff3b30";
+        } else if (porcentaje >= 20 && porcentaje < 40) {
+            estado = "🟡 Ganancia media";
+            color = "#f1c40f";
+        } else {
+            estado = "🟢 Buena ganancia";
+            color = "#28cd41";
+        }
+
+        const box = document.getElementById('previewGanancia');
+        box.style.color = color;
+        box.innerHTML = `
+            Utilidad: <b>${fmt(utilidad)}</b><br>
+            Venta: <b>${fmt(venta)}</b><br>
+            <small>${estado}</small> | <small>💡 Sugerido (30%): ${fmt(sugerido)}</small>
+        `;
+    }
+
     window.onload = cargarDesdeNube;
 </script>
-<div id="toastBox" style="
-position: fixed;
-top: 20px;
-right: 20px;
-z-index: 9999;
-display: flex;
-flex-direction: column;
-gap: 10px;
-"></div>
-
-<div id="modalContainer"></div>
 </body>
-</html>
+</html>>

@@ -3,287 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TAMAKU - Ventas (Sincronizado)</title>
+    <title>TAMAKU - Ventas Luxury Pro</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         :root {
-            --blanco: #f5f5f5;
-            --negro: #111111;
-            --dorado: #d4af37;
-            --gris-claro: #eaeaea;
-            --verde: #27ae60;
-            --rojo: #e74c3c;
-            --azul: #3498db;
+            --blanco: #ffffff;
+            --negro: #0a0a0a;
+            --dorado-brillo: #fdfc97;
+            --dorado-medio: #d4af37;
+            --dorado-oscuro: #a67c00;
+            --dorado-shadow: rgba(166, 124, 0, 0.4);
+            --gris-fondo: #f5f5f7;
+            --azul: #007aff;
+            --verde: #28cd41;
+            --rojo: #ff3b30;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(212, 175, 55, 0.2);
+            --font-main: 'Poppins', sans-serif;
         }
 
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: var(--font-main);
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background: linear-gradient(135deg, #f5f5f5, #eaeaea);
+            background: linear-gradient(135deg, #f5f5f7 0%, #e2e2e7 100%);
             height: 100vh;
             display: flex;
             overflow: hidden;
+            color: var(--negro);
         }
 
-        .app {
-            display: flex;
-            width: 100%;
-            height: 100vh;
-        }
+        .app { display: flex; width: 100%; height: 100vh; }
 
-        /* --- SIDEBAR PC --- */
+        /* --- SIDEBAR --- */
         .sidebar {
-            width: 240px;
-            background: #fff;
-            border-right: 1px solid #ddd;
-            padding: 20px;
+            width: 260px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            padding: 30px 20px;
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
+            z-index: 100;
         }
 
-        .logo { font-size: 22px; font-weight: 700; color: var(--dorado); }
-        .sub { font-size: 12px; color: #777; margin-bottom: 20px; }
+        .logo-container { text-align: center; margin-bottom: 30px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; }
+        .logo { 
+            font-size: 26px; font-weight: 800; 
+            background: linear-gradient(to bottom, var(--dorado-brillo), var(--dorado-oscuro));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+        .sub-logo { font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; }
 
         .menu { flex: 1; }
         .menu button {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 10px;
-            border: none;
-            border-radius: 12px;
-            background: var(--gris-claro);
-            cursor: pointer;
-            transition: 0.3s;
-            text-align: left;
-            font-weight: 500;
-            color: #333;
+            width: 100%; padding: 14px 18px; margin-bottom: 10px;
+            border: 1px solid transparent; border-radius: 16px;
+            background: transparent; cursor: pointer; transition: all 0.3s;
+            text-align: left; font-weight: 600; color: #444;
+            display: flex; align-items: center; gap: 12px;
         }
-
         .menu button.activo {
-            background: var(--dorado);
-            color: #fff;
-            font-weight: 600;
+            color: var(--negro);
+            background: linear-gradient(135deg, var(--dorado-brillo), var(--dorado-medio), var(--dorado-oscuro));
+            box-shadow: 0 10px 20px var(--dorado-shadow);
+            border: 1px solid var(--dorado-oscuro);
         }
 
-        /* --- ÁREA DE TRABAJO --- */
-        .main-container {
-            flex: 1;
-            display: flex;
-            overflow: hidden;
-        }
-
-        .work-area {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-        }
+        /* --- CONTENIDO --- */
+        .main-container { flex: 1; display: flex; overflow: hidden; position: relative; }
+        .work-area { flex: 1; padding: 30px; overflow-y: auto; }
 
         .card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            background: var(--blanco);
+            padding: 25px;
+            border-radius: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.02);
         }
 
-        .card h3 { margin-bottom: 12px; font-size: 18px; font-weight: 700; }
-        .label-text { font-size: 10px; font-weight: 700; color: #999; display: block; margin-top: 10px; text-transform: uppercase; }
-
-        .modo-selector { display: flex; gap: 10px; }
+        .modo-selector { display: flex; gap: 12px; }
         .btn-modo {
-            flex: 1; padding: 14px; border: none; border-radius: 14px;
-            font-weight: 700; cursor: pointer; transition: 0.3s;
+            flex: 1; padding: 16px; border: none; border-radius: 18px;
+            font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 14px;
         }
-        .btn-modo.off { background: #eee; color: #888; }
+        .btn-modo.off { background: #f0f0f3; color: #999; }
         .btn-modo.rapido-on { background: var(--azul); color: white; }
-        .btn-modo.cuenta-on { background: var(--dorado); color: white; box-shadow: 0 4px 10px rgba(212,175,55,0.3); }
-
-        .search-grid {
-            display: grid;
-            grid-template-columns: 80px 1fr 80px 100px;
-            gap: 10px;
-            align-items: flex-end;
+        .btn-modo.cuenta-on { 
+            background: linear-gradient(135deg, var(--dorado-brillo), var(--dorado-oscuro));
+            color: var(--negro);
         }
 
         input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 12px;
-            border: 2px solid #eee;
-            font-size: 14px;
-            outline: none;
+            width: 100%; padding: 14px; border-radius: 15px;
+            border: 1px solid #eee; background: #f9f9fb; outline: none;
         }
-        input:focus { border-color: var(--dorado); }
 
-        .result-box {
-            margin-top: 12px;
-            max-height: 150px;
-            overflow-y: auto;
+        .search-grid { display: grid; grid-template-columns: 80px 1fr 80px 110px; gap: 10px; align-items: flex-end; }
+        .btn-agregar { background: var(--negro); color: var(--dorado-brillo); padding: 14px; border-radius: 15px; border: none; font-weight: 800; cursor: pointer; }
+
+        .result-box { 
+            margin-top: 5px; 
+            max-height: 250px; 
+            overflow-y: auto; 
             border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: absolute; /* Para que flote sobre el contenido */
+            width: 90%;
+            z-index: 50;
+        }
+        .item-row { 
+            padding: 12px 18px; 
+            border-bottom: 1px solid #f8f8f8; 
+            display: flex; 
+            justify-content: space-between; 
+            cursor: pointer; 
             background: #fff;
+            transition: background 0.2s;
         }
+        .item-row:hover { background: #fff9e6; }
+        .item-row b { color: var(--dorado-oscuro); }
 
-        .item-row {
-            padding: 12px;
-            border-bottom: 1px solid #f1f1f1;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        /* --- CARRITO (PC E IPHONE) --- */
+        /* --- PANEL DERECHO --- */
         .right-panel {
             width: 380px;
-            background: #111;
+            background: var(--negro);
             color: #fff;
-            padding: 25px;
+            padding: 30px;
             display: flex;
             flex-direction: column;
-            box-shadow: -10px 0 20px rgba(0,0,0,0.2);
+            box-shadow: -15px 0 40px rgba(0,0,0,0.15);
         }
+        .cart-header h2 { color: var(--dorado-medio); font-size: 24px; font-weight: 800; }
+        .cart-list { flex: 1; overflow-y: auto; margin: 15px 0; }
+        .cart-item { background: #1a1a1a; padding: 12px; border-radius: 15px; margin-bottom: 10px; border-left: 4px solid var(--dorado-medio); }
+        .total-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-top: 1px solid #333; }
+        .total-row span:last-child { font-size: 32px; font-weight: 800; color: var(--dorado-brillo); }
 
-        .cart-header h2 { color: var(--dorado); font-size: 26px; }
-        .cart-list { flex: 1; overflow-y: auto; margin-top: 15px; }
+        .btn-acc { padding: 18px; border: none; border-radius: 18px; font-weight: 800; cursor: pointer; }
+        .btn-green { background: var(--verde); color: #fff; width: 100%; margin-bottom: 10px; }
 
-        .cart-item {
-            background: #1c1c1c;
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 12px;
-            border-left: 5px solid var(--dorado);
-        }
-
-        .cart-item .main-info { display: flex; justify-content: space-between; font-weight: 600; font-size: 15px; }
-        .cart-item .details { font-size: 11px; color: #777; margin-top: 5px; }
-
-        .total-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--dorado);
-            padding: 20px 0;
-            border-top: 1px solid #333;
-        }
-
-        .btn-acc { padding: 16px; border: none; border-radius: 15px; font-weight: 800; cursor: pointer; text-align: center; }
-        .btn-green { background: var(--verde); color: #fff; width: 100%; font-size: 18px; }
-        .btn-red-acc { background: #222; color: var(--rojo); width: 100%; margin-top: 10px; }
+        /* --- TOASTS --- */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: var(--negro); color: white; padding: 15px 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border-left: 5px solid var(--dorado-medio); animation: slideIn 0.3s forwards; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
         /* --- MODALES --- */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            z-index: 5000;
-            left: 0; top: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(10px);
-            justify-content: center;
-            align-items: center;
+        .modal-overlay { display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); justify-content: center; align-items: center; }
+        .modal-content { background: #fff; padding: 30px; border-radius: 35px; width: 90%; max-width: 450px; text-align: center; }
+        
+        /* BOTONES DE PAGO MEJORADOS */
+        .pay-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 25px 0; }
+        .pay-btn { 
+            padding: 20px 5px; border: 2px solid #f0f0f0; border-radius: 20px; 
+            background: #fff; cursor: pointer; transition: 0.3s;
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+        }
+        .pay-btn span { font-size: 24px; }
+        .pay-btn b { font-size: 11px; text-transform: uppercase; color: #666; }
+        .pay-btn.selected { border-color: var(--verde); background: #f0fff4; transform: scale(1.05); box-shadow: 0 5px 15px rgba(40,205,65,0.2); }
+        .pay-btn.selected b { color: var(--verde); }
+
+        /* TABBAR */
+        .tabbar { 
+            display: none; 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 70px; 
+            background: rgba(255, 255, 255, 0.98); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border); 
+            justify-content: space-around; 
+            padding-bottom: env(safe-area-inset-bottom); 
+            z-index: 6000;
+        }
+        .tab-item { 
+        flex: 1; 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        justify-content: center; 
+        text-decoration: none; 
+        color: #999; 
+        font-size: 9px; /* Tamaño de texto equilibrado para 5 iconos */
+        font-weight: 700;
+        height: 100%; /* Para que ocupe todo el alto de la barra */
+    }
+        .tab-item.activo { color: var(--dorado-oscuro); }
+                .tab-item span:first-child {
+            font-size: 22px; /* Tamaño tipo iPhone para los emojis */
+            margin-bottom: 2px;
         }
 
-        .modal-content {
-            background: #fff;
-            padding: 30px;
-            border-radius: 30px;
-            width: 95%;
-            max-width: 850px;
-            color: #111;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .audit-summary {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .summary-card {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 18px;
-            text-align: center;
-            border: 1px solid #eee;
-        }
-        .summary-card b { display: block; font-size: 20px; color: var(--dorado); }
-
-        .audit-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 15px; }
-        .audit-table th { text-align: left; padding: 12px; border-bottom: 2px solid #eee; color: #999; text-transform: uppercase; }
-        .audit-table td { padding: 12px; border-bottom: 1px solid #f1f1f1; }
-
-        .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 9px; font-weight: 800; text-transform: uppercase;}
-        .bg-pagado { background: #d4edda; color: #155724; }
-        .bg-deuda { background: #f8d7da; color: #721c24; }
-
-        /* PAGO */
-        .pay-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 20px 0; }
-        .pay-btn {
-            padding: 20px 10px; border: 2px solid #eee; border-radius: 18px;
-            background: white; cursor: pointer; text-align: center; font-weight: 700;
-        }
-        .pay-btn.selected { border-color: var(--verde); background: #eafff0; }
-
-        /* --- RESPONSIVE IPHONE --- */
         @media (max-width: 768px) {
-            .app { flex-direction: column; height: auto; overflow: auto; }
-            .sidebar {
-                width: 100%; height: auto; padding: 10px;
-                flex-direction: row; justify-content: space-around;
-                position: sticky; top: 0; z-index: 1500; border-right: none; border-bottom: 1px solid #ddd;
+            .sidebar { display: none; } /* Oculta el lateral en el celular */
+            .tabbar { display: flex; }  /* Activa el menú de abajo SOLO en el celular */
+            
+            .right-panel { 
+                position: fixed; 
+                bottom: 0; /* Cambiado de 70px a 0 para cubrir la tabbar al abrirse */
+                left: 0; 
+                width: 100%; 
+                height: 85vh; /* Altura máxima al abrir */
+                border-radius: 30px 30px 0 0; 
+                transform: translateY(calc(100% - 130px)); /* Deja ver el total y el botón de registro */
+                z-index: 7000; /* Por encima de la tabbar */
+                transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
             }
-            .sidebar .logo, .sidebar .sub { display: none; }
-            .menu { display: flex; gap: 5px; width: 100%; overflow-x: auto; }
-            .menu button { margin-bottom: 0; font-size: 11px; padding: 10px; white-space: nowrap; width: auto; }
-
-            .main-container { flex-direction: column; height: auto; }
-            .right-panel {
-                width: 100%; min-height: 100vh; border-radius: 35px 35px 0 0;
-                margin-top: 20px;
+            .handle { 
+                width: 50px; 
+                height: 6px; 
+                background: #444; 
+                border-radius: 10px; 
+                margin: -10px auto 20px auto; 
+                display: block; 
             }
-            .search-grid { grid-template-columns: 1fr 1fr; }
-            .search-grid div:nth-child(2) { grid-column: span 2; }
-            .search-grid button { grid-column: span 2; }
+            .right-panel.open { transform: translateY(0); }
+            .handle { width: 40px; height: 5px; background: #555; border-radius: 10px; margin: 0 auto 15px auto; display: block; }
+            .main-container { flex-direction: column; }
+            .work-area { padding-bottom: 150px; }
         }
     </style>
 </head>
 <body>
 
+<div id="toast-container"></div>
+
 <div class="app">
     <div class="sidebar">
-        <div>
+        <div class="logo-container">
             <div class="logo">TAMAKU</div>
-            <div class="sub">Miscelánea & Cigarrería</div>
+            <div class="sub-logo">Luxury Business Pro</div>
         </div>
-
         <div class="menu">
-            <button onclick="location.href='index.html'">🏠 Inicio</button>
-            <button class="activo" onclick="location.href='ventas.html'">💰 Ventas</button>
-            <button onclick="location.href='inventario.html'">📦 Inventario</button>
-            <button onclick="alert('Próximamente')">➕ Agregar</button>
-            <button onclick="alert('Próximamente')">📊 Reportes</button>
+            <button onclick="location.href='index.html'"><span>🏠</span> Inicio</button>
+            <button class="activo" onclick="location.href='ventas.html'"><span>💰</span> Ventas</button>
+            <button onclick="location.href='inventario.html'"><span>📦</span> Inventario</button>
+            <button onclick="location.href='cierres.html'"><span>🧾</span> Cierres</button>
+            <button onclick="location.href='reportes.html'"><span>📊</span> Reportes</button>
         </div>
     </div>
 
     <div class="main-container">
         <div class="work-area">
-            
-            <div class="card" style="background: #fff3cd; border: 1px solid #ffeeba;">
-                <h3 id="cajaStatus">📦 Caja Cerrada</h3>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <button id="btnAbrir" class="btn-modo rapido-on" style="padding: 10px 20px;" onclick="abrirCaja()">Abrir Jornada</button>
-                    <button id="btnAudit" class="btn-modo rapido-on" style="display:none; background: var(--azul);" onclick="mostrarAuditoria()">📋 Auditoría de Hoy</button>
-                    <button id="btnCerrar" class="btn-modo off" style="display:none; background: var(--rojo); color:white" onclick="cerrarCaja()">Cerrar Caja</button>
+            <div class="card" style="background: #fffdf0; border: 1px solid rgba(212,175,55,0.3);">
+                <h3 id="cajaStatus">Cargando...</h3>
+                <div style="display: flex; gap: 8px;">
+                    <button id="btnAbrir" class="btn-modo rapido-on" onclick="abrirCaja()">Abrir Jornada</button>
+                    <button id="btnAudit" class="btn-modo rapido-on" style="background:#000; color:#fff" onclick="mostrarAuditoria()">📋 Auditoría</button>
+                    <button id="btnCerrar" class="btn-modo" style="background:#fff; color:var(--rojo); border:1px solid #eee;" onclick="confirmarCierre()">Cerrar</button>
                 </div>
             </div>
 
@@ -296,107 +277,107 @@
                 </div>
 
                 <div class="card" id="cardCuentas" style="display:none;">
-                    <h3>Cuentas Pendientes</h3>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" id="inputCliente" placeholder="Nombre cliente...">
-                        <button class="btn-modo rapido-on" style="width: 100px" onclick="crearCuenta()">Abrir</button>
+                    <h3>Clientes</h3>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="inputCliente" placeholder="Nombre...">
+                        <button class="btn-agregar" onclick="crearCuenta()">ABRIR</button>
                     </div>
-                    <div id="chipsCuentas" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                    <div id="chipsCuentas" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 6px;"></div>
                 </div>
 
                 <div class="card">
-                    <h3>Selección de Productos</h3>
+                    <h3>Productos</h3>
                     <div class="search-grid">
-                        <div><label class="label-text">PLU</label><input type="number" id="plu" onfocus="this.value=''" oninput="buscarPlu()"></div>
-                        <div><label class="label-text">PRODUCTO</label><input type="text" id="nom" placeholder="Nombre..." oninput="buscarNombre()"></div>
-                        <div><label class="label-text">CANT.</label><input type="number" id="cant" value="0" onfocus="this.value=''"></div>
-                        <button class="btn-modo rapido-on" style="background:var(--dorado)" onclick="agregar()">AGREGAR</button>
+                        <input type="number" id="plu" placeholder="PLU" oninput="buscarPlu()">
+                        <input type="text" id="nom" placeholder="Producto..." oninput="buscarNombre()">
+                        <input type="number" id="cant" value="1">
+                        <button class="btn-agregar" onclick="agregar()">AGREGAR</button>
                     </div>
                     <div class="result-box" id="res"></div>
                 </div>
             </div>
         </div>
 
-        <div class="right-panel">
-            <div class="cart-header">
-                <h2 id="cartTitle">Venta Rápida</h2>
-                <small id="reloj"></small>
-            </div>
+        <div class="right-panel" id="cartPanel" onclick="toggleCartMobile()">
+            <span class="handle"></span>
+            <div class="cart-header"><h2>Resumen</h2><span id="reloj"></span></div>
             <div class="cart-list" id="listaCarrito"></div>
-            <div class="total-section">
-                <div class="total-row"><span>Total</span><span id="totalTxt">$ 0</span></div>
-                <button class="btn-acc btn-green" onclick="abrirPago()">✅ REGISTRAR VENTA</button>
-                <button class="btn-acc btn-red-acc" onclick="cancelar()">❌ CANCELAR</button>
-            </div>
+            <div class="total-row"><span>Total</span><span id="totalTxt">$ 0</span></div>
+            <button class="btn-acc btn-green" onclick="event.stopPropagation(); abrirPago();">✅ REGISTRAR VENTA</button>
+            <button class="btn-acc" style="background:#222; color:var(--rojo);" onclick="event.stopPropagation(); confirmarBorrado();">BORRAR</button>
         </div>
+    </div>
+
+    <nav class="tabbar">
+    <a href="index.html" class="tab-item"><span>🏠</span><span>Inicio</span></a>
+    <a href="ventas.html" class="tab-item activo"><span>💰</span><span>Ventas</span></a>
+    <a href="inventario.html" class="tab-item"><span>📦</span><span>Stock</span></a>
+    <a href="cierres.html" class="tab-item"><span>🧾</span><span>Cierres</span></a>
+    <a href="reportes.html" class="tab-item"><span>📊</span><span>Reportes</span></a>
+</nav>
+</div>
+<div id="modalAuditoria" class="modal-overlay">
+    <div class="modal-content" style="max-width: 600px; text-align: left;">
+        <h2 style="text-align: center; margin-bottom: 20px;">📋 Auditoría de Jornada</h2>
+        <div id="resumenAuditoria" style="max-height: 400px; overflow-y: auto;">
+    <p style="text-align:center; color:#999; padding:20px;">Esperando datos de la jornada...</p>
+</div>
+        <button class="btn-acc" style="background:var(--negro); color:white; width:100%; margin-top:20px;" onclick="document.getElementById('modalAuditoria').style.display='none'">CERRAR</button>
     </div>
 </div>
 
 <div id="modalPago" class="modal-overlay">
-    <div class="modal-content" style="max-width: 450px; text-align: center;">
-        <h2 style="font-size: 28px;">Finalizar Pago</h2>
-        <h1 id="montoPago" style="font-size: 45px; margin: 20px 0; color: var(--dorado);">$ 0</h1>
-        <label class="label-text">Medio de Pago</label>
-        <div class="pay-grid">
-            <div class="pay-btn" id="payEfec" onclick="prepararMetodo('Efectivo')">💵<br>Efectivo</div>
-            <div class="pay-btn" id="payNeq" onclick="prepararMetodo('Nequi')">📱<br>Nequi</div>
-            <div class="pay-btn" id="payDav" onclick="prepararMetodo('Daviplata')">📲<br>Davi</div>
-        </div>
-        <div id="calcBox" style="display: none; background: #f9f9f9; padding: 20px; border-radius: 20px; margin-top: 10px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span>¿Con cuánto paga?</span>
-                <input type="number" id="pagaCon" onfocus="this.value=''" oninput="calcularVueltas()" style="width: 130px; text-align: right; font-weight: 700; font-size: 18px;">
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
-                <b>Vueltas:</b><b id="vueltasTxt" style="color: var(--rojo); font-size: 24px;">$ 0</b>
-            </div>
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 25px;">
-            <button class="btn-acc btn-red-acc" style="background:#888; color:white;" onclick="document.getElementById('modalPago').style.display='none'">Volver</button>
-            <button class="btn-acc btn-green" onclick="procesarVenta()">CONFIRMAR</button>
-        </div>
-    </div>
-</div>
-
-<div id="modalAudit" class="modal-overlay">
     <div class="modal-content">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="color: var(--dorado);">Auditoría Contable (Hoy)</h2>
-            <button onclick="document.getElementById('modalAudit').style.display='none'" style="background:none; border:none; font-size: 30px;">&times;</button>
+        <h2>Pasarela de Pago</h2>
+        <h1 id="montoPago" style="font-size: 45px; margin: 15px 0; color: var(--dorado-medio);">$ 0</h1>
+        
+        <div class="pay-grid">
+            <div class="pay-btn" id="payEfectivo" onclick="seleccionarMetodo('Efectivo')">
+                <span>💵</span><b>Efectivo</b>
+            </div>
+            <div class="pay-btn" id="payNequi" onclick="seleccionarMetodo('Nequi')">
+                <span>📱</span><b>Nequi</b>
+            </div>
+            <div class="pay-btn" id="payDaviplata" onclick="seleccionarMetodo('Daviplata')">
+                <span>📲</span><b>Davi</b>
+            </div>
         </div>
-        <div class="audit-summary">
-            <div class="summary-card"><span>Efectivo</span><b id="aEfec">$ 0</b></div>
-            <div class="summary-card"><span>Nequi</span><b id="aNeq">$ 0</b></div>
-            <div class="summary-card"><span>Daviplata</span><b id="aDav">$ 0</b></div>
-            <div class="summary-card" style="background: #fff1f1;"><span style="color:var(--rojo)">Deuda</span><b id="aDeu" style="color:var(--rojo)">$ 0</b></div>
+
+        <div id="calcBox" style="display: none; background: #f8f8fa; padding: 20px; border-radius: 20px; margin-bottom: 20px;">
+            <label class="label-text" style="font-size:10px; color:#999; margin-bottom:5px; display:block;">PAGA CON:</label>
+            <input type="number" id="pagaCon" placeholder="0" oninput="calcularVueltas()" style="text-align: center; font-size: 22px; font-weight: 800; border:none; background:transparent;">
+            <div style="margin-top:15px; border-top:1px solid #ddd; padding-top:10px;">
+                <span style="font-size:12px; color:#666;">CAMBIO:</span>
+                <h2 id="vueltasTxt" style="color: var(--verde);">$ 0</h2>
+            </div>
         </div>
-        <table class="audit-table">
-            <thead><tr><th>Hora</th><th>Cliente</th><th>Producto</th><th>Cant.</th><th>Unidad</th><th>Subtotal</th><th>Estado</th></tr></thead>
-            <tbody id="auditBody"></tbody>
-        </table>
-        <button class="btn-acc btn-blue" style="width:100%; margin-top:30px; color:white;" onclick="document.getElementById('modalAudit').style.display='none'">Cerrar Auditoría</button>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <button class="btn-acc" style="background:#f0f0f0; color:#666;" onclick="document.getElementById('modalPago').style.display='none'">CANCELAR</button>
+            <button class="btn-acc btn-green" style="margin:0;" onclick="confirmarVentaFinal()">CONFIRMAR</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // --- CONEXIÓN SUPABASE ---
     const supabaseUrl = 'https://xofaoaikrtldkvfifnub.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvZmFvYWlrcnRsZGt2ZmlmbnViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0ODc4ODYsImV4cCI6MjA5MTA2Mzg4Nn0.8QStNtgFGf6qStCJV9jmI8rxvEbDo-fcdOvhCOX9uNA';
-
     const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-    // Ahora productos vienen de la nube
-    let PRODUCTOS_INVENTARIO = [];
-    // --- CONEXIÓN CON INVENTARIO ---
-    // Aquí está el truco: leemos la misma llave que usa el inventario
+    let PRODUCTOS_INVENTARIO = [], historial = JSON.parse(localStorage.getItem('tk_hist')) || [];
+    let cajaActiva = JSON.parse(localStorage.getItem('tk_caja')) || false, cuentas = JSON.parse(localStorage.getItem('tk_cuentas')) || [];
+    let carritoR = JSON.parse(localStorage.getItem('tk_carro_r')) || [], modo = 'rapido', cActiva = null, pSel = null, metTemp = "";
 
-    let historial = JSON.parse(localStorage.getItem('tk_hist')) || [];
-    let cajaActiva = JSON.parse(localStorage.getItem('tk_caja')) || false;
-    let cuentas = JSON.parse(localStorage.getItem('tk_cuentas')) || [];
-    let carritoR = JSON.parse(localStorage.getItem('tk_carro_r')) || [];
+    const fmt = (n) => "$ " + Math.round(n || 0).toLocaleString('es-CO');
 
-    let modo = 'rapido', cActiva = null, pSel = null, metTemp = "";
-    const fmt = (n) => "$ " + Math.round(n).toLocaleString('es-CO');
+    function showToast(msg) {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div'); toast.className = 'toast';
+        toast.innerHTML = `✨ <span>${msg}</span>`; container.appendChild(toast);
+        setTimeout(() => toast.remove(), 2500);
+    }
+
+    function toggleCartMobile() { if (window.innerWidth <= 768) document.getElementById('cartPanel').classList.toggle('open'); }
 
     function sync() {
         localStorage.setItem('tk_hist', JSON.stringify(historial));
@@ -405,64 +386,56 @@
         localStorage.setItem('tk_carro_r', JSON.stringify(carritoR));
     }
 
-    function abrirCaja() { if(confirm("¿Abrir jornada?")) { cajaActiva = true; sync(); renderCaja(); } }
-    function cerrarCaja() { if(confirm("¿Cerrar jornada?")) { cajaActiva = false; sync(); renderCaja(); } }
+    function abrirCaja() { cajaActiva = true; sync(); renderCaja(); showToast("Jornada iniciada"); }
+    function confirmarCierre() { if(confirm("¿Cerrar caja?")) { cajaActiva = false; sync(); renderCaja(); showToast("Caja cerrada"); } }
     
     function renderCaja() {
         document.getElementById('panelVenta').style.display = cajaActiva ? "block" : "none";
         document.getElementById('btnAbrir').style.display = cajaActiva ? "none" : "block";
-        document.getElementById('btnAudit').style.display = cajaActiva ? "block" : "none";
-        document.getElementById('btnCerrar').style.display = cajaActiva ? "block" : "none";
-        document.getElementById('cajaStatus').innerText = cajaActiva ? "🟢 Jornada Iniciada" : "📦 Caja Cerrada";
+        document.getElementById('cajaStatus').innerText = cajaActiva ? "🟢 Jornada Abierta" : "📦 Caja Cerrada";
+    }
+
+    async function cargarProductosDesdeNube() {
+        const { data } = await _supabase.from('productos').select('*');
+        if (data) PRODUCTOS_INVENTARIO = data.map(p => ({ codigo: p.codigo, nombre: p.nombre, precio: p.precio_venta }));
     }
 
     function buscarPlu() {
-    let codigoInput = document.getElementById('plu').value.trim();
-    let p = PRODUCTOS_INVENTARIO.find(x => String(x.codigo) === codigoInput);
-
-    if (p) {
-        pSel = p;
-        document.getElementById('nom').value = p.nombre;
-    } else {
-        pSel = null;
-        document.getElementById('nom').value = "";
+        let p = PRODUCTOS_INVENTARIO.find(x => String(x.codigo) === document.getElementById('plu').value.trim());
+        if (p) { pSel = p; document.getElementById('nom').value = p.nombre; }
     }
-}
 
     function buscarNombre() {
         let val = document.getElementById('nom').value.toLowerCase();
-        let res = document.getElementById('res'); res.innerHTML = "";
-        if(!val) {
-            res.innerHTML = "";
-            return;
-        }
-        if(PRODUCTOS_INVENTARIO.length === 0){
-            res.innerHTML = `
-                <div class="item-row" style="justify-content:center; color:#999;">
-                    ⚠️ No tienes productos en inventario
-                </div>
-            `;
-            return;
-        }
-        PRODUCTOS_INVENTARIO.filter(x => x.nombre.toLowerCase().includes(val)).forEach(p => {
-            let d = document.createElement('div'); d.className = "item-row";
+        let res = document.getElementById('res'); 
+        res.innerHTML = "";
+        if(val.length < 2) return; // Solo busca si hay más de 2 letras para ahorrar procesos
+        
+        let filtrados = PRODUCTOS_INVENTARIO.filter(x => x.nombre.toLowerCase().includes(val));
+        
+        filtrados.slice(0, 10).forEach(p => { // Limitamos a 10 resultados para no saturar
+            let d = document.createElement('div'); 
+            d.className = "item-row";
             d.innerHTML = `<span>${p.nombre}</span> <b>${fmt(p.precio)}</b>`;
-            d.onclick = () => { pSel = p; document.getElementById('nom').value = p.nombre; document.getElementById('plu').value = p.codigo; res.innerHTML = ""; };
+            d.onclick = () => { 
+                pSel = p; 
+                document.getElementById('nom').value = p.nombre; 
+                document.getElementById('plu').value = p.codigo; 
+                res.innerHTML = ""; 
+                document.getElementById('cant').focus(); // Salta automáticamente a cantidad
+            };
             res.appendChild(d);
         });
     }
 
     function agregar() {
         let n = parseInt(document.getElementById('cant').value);
-        if(!pSel || n <= 0) return alert("Selección o cantidad inválida");
-        if (pSel.stock !== undefined && n > pSel.stock) {
-        return alert("⚠️ No hay suficiente stock");
-        }
-        let item = { uid: Date.now(), nombre: pSel.nombre, precio: pSel.precio, cant: n, sub: pSel.precio * n, hora: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) };
+        if(!pSel || n <= 0) return showToast("Seleccione un producto");
+        let item = { uid: Date.now(), nombre: pSel.nombre, precio: pSel.precio, cant: n, sub: pSel.precio * n };
         if(modo === 'rapido') carritoR.push(item);
-        else { if(!cActiva) return alert("Selecciona una cuenta"); cActiva.items.push(item); }
-        document.getElementById('plu').value = ""; document.getElementById('nom').value = ""; document.getElementById('cant').value = "0";
-        sync(); render();
+        else { if(!cActiva) return showToast("Elige un cliente"); cActiva.items.push(item); }
+        document.getElementById('plu').value = ""; document.getElementById('nom').value = ""; document.getElementById('cant').value = "1";
+        pSel = null; sync(); render(); showToast("Producto agregado");
     }
 
     function render() {
@@ -472,20 +445,17 @@
         list.forEach(i => {
             t += i.sub;
             cont.innerHTML += `<div class="cart-item">
-                <span class="main-info"><b>${i.nombre}</b><span>${fmt(i.sub)}</span></span>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
-                    <span class="details">${i.cant} un. x ${fmt(i.precio)} | ${i.hora}</span>
-                    <button style="color:red; background:none; border:none; cursor:pointer; font-weight:700;" onclick="quitar(${i.uid})">QUITAR</button>
-                </div>
+                <div style="display:flex; justify-content:space-between;"><b>${i.nombre}</b><span>${fmt(i.sub)}</span></div>
+                <div style="font-size:10px; color:#666;">${i.cant} x ${fmt(i.precio)}</div>
             </div>`;
         });
         document.getElementById('totalTxt').innerText = fmt(t);
-        document.getElementById('cartTitle').innerText = modo === 'rapido' ? "Venta Rápida" : (cActiva ? "Cuenta: "+cActiva.nombre : "Seleccione Cuenta");
+        
         let chipCont = document.getElementById('chipsCuentas'); chipCont.innerHTML = "";
         cuentas.forEach(c => {
-            let b = document.createElement('button'); b.className = "btn-modo"; b.style.width="auto"; b.style.padding="8px 15px";
+            let b = document.createElement('button'); b.className = "btn-modo"; b.style.width="auto";
             if(cActiva && cActiva.id === c.id) b.classList.add('cuenta-on'); else b.classList.add('off');
-            b.innerText = "👤 " + c.nombre; b.onclick = () => { cActiva = c; setModo('cuenta'); };
+            b.innerText = c.nombre; b.onclick = () => { cActiva = c; setModo('cuenta'); };
             chipCont.appendChild(b);
         });
     }
@@ -500,33 +470,34 @@
 
     function crearCuenta() {
         let n = document.getElementById('inputCliente').value.trim();
-        if(n) { let c = {id: Date.now(), nombre: n.toUpperCase(), items: []}; cuentas.push(c); cActiva = c; document.getElementById('inputCliente').value = ""; sync(); render(); }
-    }
-
-    function quitar(uid) {
-        if(modo === 'rapido') carritoR = carritoR.filter(x => x.uid !== uid);
-        else cActiva.items = cActiva.items.filter(x => x.uid !== uid);
-        sync(); render();
+        if(n) { 
+            let c = {id: Date.now(), nombre: n.toUpperCase(), items: []}; 
+            cuentas.push(c); cActiva = c; document.getElementById('inputCliente').value = ""; 
+            sync(); render(); showToast("Cuenta abierta");
+        }
     }
 
     function abrirPago() {
         let t = parseInt(document.getElementById('totalTxt').innerText.replace(/[^0-9]/g, "")) || 0;
-        if(t <= 0) return alert("Carrito vacío");
-        document.getElementById('montoPago').innerText = t;
+        if(t <= 0) return showToast("No hay productos");
+        document.getElementById('montoPago').innerText = fmt(t);
         document.getElementById('modalPago').style.display = "flex";
         document.getElementById('calcBox').style.display = "none";
         metTemp = "";
         document.querySelectorAll('.pay-btn').forEach(x => x.classList.remove('selected'));
     }
 
-    function prepararMetodo(m) {
+    // LÓGICA DE SELECCIÓN DE MÉTODO CORREGIDA
+    function seleccionarMetodo(m) {
         metTemp = m;
         document.querySelectorAll('.pay-btn').forEach(x => x.classList.remove('selected'));
-        if(m === 'Efectivo') document.getElementById('payEfec').classList.add('selected');
-        if(m === 'Nequi') document.getElementById('payNeq').classList.add('selected');
-        if(m === 'Daviplata') document.getElementById('payDav').classList.add('selected');
+        document.getElementById('pay' + m).classList.add('selected');
         document.getElementById('calcBox').style.display = m === 'Efectivo' ? "block" : "none";
-        if(m === 'Efectivo') { document.getElementById('pagaCon').value = ""; document.getElementById('vueltasTxt').innerText = "$ 0"; }
+        if(m === 'Efectivo') {
+            document.getElementById('pagaCon').value = "";
+            document.getElementById('vueltasTxt').innerText = "$ 0";
+            document.getElementById('pagaCon').focus();
+        }
     }
 
     function calcularVueltas() {
@@ -535,85 +506,113 @@
         document.getElementById('vueltasTxt').innerText = fmt(p - t > 0 ? p - t : 0);
     }
 
-    function procesarVenta() {
-        if(!metTemp) return alert("Seleccione método");
-        let list = modo === 'rapido' ? [...carritoR] : [...cActiva.items];
-        historial.unshift({ id: Date.now(), fecha: new Date().toLocaleDateString(), hora: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), cliente: modo === 'rapido' ? 'V.RÁPIDA' : cActiva.nombre, items: list, total: list.reduce((a, b) => a + b.sub, 0), metodo: metTemp });
-        if(modo === 'rapido') carritoR = []; else { cuentas = cuentas.filter(x => x.id !== cActiva.id); cActiva = null; }
-        document.getElementById('modalPago').style.display = "none";
-        sync(); render(); alert("Venta Exitosa");
-    }
+    async function confirmarVentaFinal() {
+    if(!metTemp) return showToast("Seleccione medio de pago");
+    
+    let list = modo === 'rapido' ? [...carritoR] : [...cActiva.items];
+    if(list.length === 0) return showToast("El carrito está vacío");
 
-    function mostrarAuditoria() {
-        let hoy = new Date().toLocaleDateString();
-        let filtrado = historial.filter(x => x.fecha === hoy);
-        let ef = 0, nq = 0, dv = 0, deu = 0;
-        let body = document.getElementById('auditBody'); body.innerHTML = "";
-        filtrado.forEach(v => {
-            if(v.metodo === 'Efectivo') ef += v.total;
-            if(v.metodo === 'Nequi') nq += v.total;
-            if(v.metodo === 'Daviplata') dv += v.total;
-            v.items.forEach((prod, idx) => {
-                body.innerHTML += `<tr><td>${idx === 0 ? v.hora : ''}</td><td>${idx === 0 ? '<b>' + v.cliente + '</b>' : ''}</td><td>${prod.nombre}</td><td>${prod.cant}</td><td>${fmt(prod.precio)}</td><td><b>${fmt(prod.sub)}</b></td><td>${idx === 0 ? '<span class="status-badge bg-pagado">PAGADO</span>' : ''}</td></tr>`;
-            });
-        });
-        cuentas.forEach(c => {
-            let totalC = c.items.reduce((a, b) => a + b.sub, 0); deu += totalC;
-            c.items.forEach((prod, idx) => {
-                body.innerHTML += `<tr style="background:#fffafa"><td>Pend.</td><td>${idx === 0 ? '<b>' + c.nombre + '</b>' : ''}</td><td>${prod.nombre}</td><td>${prod.cant}</td><td>${fmt(prod.precio)}</td><td><b>${fmt(prod.sub)}</b></td><td>${idx === 0 ? '<span class="status-badge bg-deuda">DEUDA</span>' : ''}</td></tr>`;
-            });
-        });
-        document.getElementById('aEfec').innerText = fmt(ef);
-        document.getElementById('aNeq').innerText = fmt(nq);
-        document.getElementById('aDav').innerText = fmt(dv);
-        document.getElementById('aDeu').innerText = fmt(deu);
-        document.getElementById('modalAudit').style.display = "flex";
-    }
+    let t = list.reduce((a, b) => a + b.sub, 0);
+    let cliente = modo === 'rapido' ? 'V.RÁPIDA' : cActiva.nombre;
+    let pagCon = parseInt(document.getElementById('pagaCon').value) || 0;
+    let vueltas = (pagCon - t > 0) ? (pagCon - t) : 0;
 
-    function cancelar() {
-        if(confirm("¿Borrar lista?")) {
-            if(modo === 'rapido') carritoR = []; else if(cActiva) { cuentas = cuentas.filter(x => x.id !== cActiva.id); cActiva = null; }
-            sync(); render();
-        }
-    }
+    // BLOQUE 1: Insertar en la tabla 'ventas' (Cabecera)
+    const { data: ventaData, error: errorVenta } = await _supabase
+        .from('ventas')
+        .insert([{
+            cliente: cliente,
+            metodo_pago: metTemp,
+            total_venta: t,
+            pago_con: pagCon,
+            cambio: vueltas
+        }])
+        .select();
 
-    setInterval(() => {
-        document.getElementById('reloj').innerText = new Date().toLocaleString();
-    }, 1000);
-    async function iniciarApp(){
-    await cargarProductosDesdeNube();
-    renderCaja();
-    render();
-}
+    if (errorVenta) return showToast("❌ Error factura: " + errorVenta.message);
 
-iniciarApp();
-    async function cargarProductosDesdeNube() {
-    const { data, error } = await _supabase
-        .from('productos')
-        .select('*');
-
-    if (error) {
-        console.error("Error cargando productos:", error);
-        alert("Error conectando con inventario");
-        return;
-    }
-
-    if (!data || data.length === 0) {
-        console.warn("No hay productos en la base de datos");
-        alert("⚠️ No tienes productos en inventario");
-        return;
-    }
-
-    PRODUCTOS_INVENTARIO = data.map(p => ({
-    codigo: p.codigo,
-    nombre: p.nombre,
-    precio: p.precio_venta,
-    stock: p.stock
+    // BLOQUE 2: Preparar los productos para 'venta_detalles'
+    const idVenta = ventaData[0].id;
+    const detalles = list.map(item => ({
+        venta_id: idVenta,
+        nombre_producto: item.nombre,
+        cantidad: item.cant,
+        precio_unitario: item.precio,
+        subtotal: item.sub
     }));
 
-    console.log("Productos cargados:", PRODUCTOS_INVENTARIO);
+    // BLOQUE 3: Insertar todos los productos de un solo golpe
+    const { error: errorDetalle } = await _supabase
+        .from('venta_detalles')
+        .insert(detalles);
+
+    if(!errorDetalle) {
+        // Limpiar todo si salió bien
+        if(modo === 'rapido') carritoR = []; 
+        else { cuentas = cuentas.filter(x => x.id !== cActiva.id); cActiva = null; }
+        
+        document.getElementById('modalPago').style.display = "none";
+        if (window.innerWidth <= 768) document.getElementById('cartPanel').classList.remove('open');
+        
+        sync(); 
+        render();
+        showToast("✅ Venta registrada con éxito");
+    } else {
+        showToast("❌ Error productos: " + errorDetalle.message);
+    }
+}
+    function confirmarBorrado() { if(confirm("¿Vaciar carrito?")) { if(modo === 'rapido') carritoR = []; else if(cActiva) cActiva.items = []; sync(); render(); showToast("Vaciado"); } }
+
+    async function mostrarAuditoria() {
+    const modal = document.getElementById('modalAuditoria');
+    const contenedor = document.getElementById('resumenAuditoria');
+    
+    // Abrimos el modal y mostramos estado de carga
+    modal.style.display = 'flex';
+    contenedor.innerHTML = `<div style="text-align:center; padding:20px;">
+                                <span style="font-size:24px;">⏳</span>
+                                <p>Consultando ventas en la nube...</p>
+                            </div>`;
+
+    const hoy = new Date().toISOString().split('T')[0];
+    const { data: ventas, error } = await _supabase
+        .from('ventas')
+        .select('*')
+        .gte('fecha_hora', hoy);
+
+    if (error) {
+        contenedor.innerHTML = "<p>Error: " + error.message + "</p>";
+        return;
+    }
+
+    let totales = { Efectivo: 0, Nequi: 0, Daviplata: 0 };
+    ventas.forEach(v => { if (totales[v.metodo_pago] !== undefined) totales[v.metodo_pago] += v.total_venta; });
+    let totalG = totales.Efectivo + totales.Nequi + totales.Daviplata;
+
+    contenedor.innerHTML = `
+        <div style="background: #f0f9ff; padding: 15px; border-radius: 15px; margin-bottom: 15px;">
+            <p><b>Total General Hoy:</b> <span style="float:right">${fmt(totalG)}</span></p>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
+            <div style="background:#fff; border:1px solid #eee; padding:10px; border-radius:10px; text-align:center;">💵<br><small>Efectivo</small><br><b>${fmt(totales.Efectivo)}</b></div>
+            <div style="background:#fff; border:1px solid #eee; padding:10px; border-radius:10px; text-align:center;">📱<br><small>Nequi</small><br><b>${fmt(totales.Nequi)}</b></div>
+            <div style="background:#fff; border:1px solid #eee; padding:10px; border-radius:10px; text-align:center;">📲<br><small>Davi</small><br><b>${fmt(totales.Daviplata)}</b></div>
+        </div>
+        <h3>Últimas Ventas</h3>
+        <table style="width:100%; font-size: 11px; margin-top:10px;">
+            ${ventas.reverse().map(v => `
+                <tr style="border-bottom:1px solid #eee;">
+                    <td style="padding:5px 0;">${new Date(v.fecha_hora).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</td>
+                    <td><b>${v.cliente}</b></td>
+                    <td style="text-align:right;">${fmt(v.total_venta)}</td>
+                </tr>
+            `).join('')}
+        </table>`;
 }
 
+    setInterval(() => document.getElementById('reloj').innerText = new Date().toLocaleTimeString(), 1000);
+    async function iniciar() { await cargarProductosDesdeNube(); renderCaja(); render(); }
+    iniciar();
 </script>
 </body>
 </html>
