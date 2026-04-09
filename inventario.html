@@ -169,7 +169,7 @@
         @media (max-width: 768px) {
             .sidebar { display: none; }
             .tabbar { display: flex; }
-            .content { padding: 20px; padding-bottom: 110px; }
+            .content { padding: 20px; padding-bottom: 150px; } /* Ajustado a 150px como en los otros módulos */
             .grid-form { grid-template-columns: 1fr 1fr; gap: 12px; }
             .grid-form .input-group:nth-child(2) { grid-column: span 2; }
             .btn-save { grid-column: span 2; }
@@ -207,11 +207,11 @@
             <div class="sub-logo">Luxury Business Pro</div>
         </div>
         <div class="menu">
-            <button onclick="location.href='index.html'"><span>🏠</span> Inicio</button>
-            <button onclick="location.href='ventas.html'"><span>💰</span> Ventas</button>
-            <button class="activo"><span>📦</span> Inventario</button>
-            <button onclick="location.href='cierres.html'"><span>🧾</span> Cierres</button>
-            <button onclick="alert('Próximamente')"><span>📊</span> Reportes</button>
+            <button onclick="location.href='index.html'"><span class="icon">🏠</span> Inicio</button>
+            <button onclick="location.href='ventas.html'"><span class="icon">💰</span> Ventas</button>
+            <button class="activo" onclick="location.href='inventario.html'"><span class="icon">📦</span> Inventario</button>
+            <button onclick="location.href='cierres.html'"><span class="icon">🧾</span> Cierres</button>
+            <button onclick="location.href='reportes.html'"><span class="icon">📊</span> Reportes</button>
         </div>
     </div>
 
@@ -307,6 +307,9 @@
         </a>
         <a href="cierres.html" class="tab-item">
             <span class="icon">🧾</span><span>Cierres</span>
+        </a>
+        <a href="reportes.html" class="tab-item">
+            <span class="icon">📊</span><span>Reportes</span>
         </a>
     </nav>
 </div>
