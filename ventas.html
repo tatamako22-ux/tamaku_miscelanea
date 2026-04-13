@@ -94,15 +94,29 @@
 
         .modo-selector { display: flex; gap: 12px; }
         .btn-modo {
-            flex: 1; padding: 16px; border: none; border-radius: 18px;
-            font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 14px;
+            flex: 1; padding: 16px; border: 2px solid transparent; border-radius: 18px;
+            font-weight: 700; cursor: pointer; transition: all 0.3s ease; font-size: 14px;
         }
-        .btn-modo.off { background: #f0f0f3; color: #999; }
-        .btn-modo.rapido-on { background: var(--azul); color: white; }
+        .btn-modo.off { background: #f0f0f3; color: #999; border-color: transparent; }
+        
+        /* Brillo Azul para Venta Rápida */
+        .btn-modo.rapido-on { 
+            background: var(--azul); 
+            color: white; 
+            box-shadow: 0 0 20px rgba(0, 122, 255, 0.4);
+            border-color: #0056b3;
+        }
+        
+        /* Brillo Dorado para Cuenta Abierta */
         .btn-modo.cuenta-on { 
             background: linear-gradient(135deg, var(--dorado-brillo), var(--dorado-oscuro));
             color: var(--negro);
+            box-shadow: 0 0 20px var(--dorado-shadow);
+            border-color: var(--dorado-medio);
+            transform: scale(1.02);
         }
+        /* Añadimos este para Venta Rápida también */
+        .btn-modo.rapido-on { background: var(--azul); color: white; box-shadow: 0 0 15px rgba(0,122,255,0.3); border: 2px solid #0056b3; }
 
         input {
             width: 100%; padding: 14px; border-radius: 15px;
@@ -117,10 +131,26 @@
             max-height: 250px; 
             overflow-y: auto; 
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            position: absolute; /* Para que flote sobre el contenido */
-            width: 90%;
-            z-index: 50;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            position: absolute; 
+            width: 90%; /* Ancho fijo para que no desaparezca */
+            max-width: 500px;
+            z-index: 99999 !important; 
+            background: #ffffff !important; 
+            border: 1px solid #ddd;
+            display: none; /* Se activa por JS */
+        }
+
+        /* Estilos para los botones de cliente con opción de eliminar */
+        .chip-container { position: relative; display: inline-block; margin-right: 10px; margin-bottom: 10px; }
+        .btn-borrar-cuenta {
+            position: absolute; top: -8px; right: -8px;
+            background: var(--rojo); color: white; border: none;
+            border-radius: 50%; width: 24px; height: 24px;
+            font-size: 12px; cursor: pointer; font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            z-index: 10;
         }
         .item-row { 
             padding: 12px 18px; 
@@ -151,7 +181,7 @@
         .cart-list { flex: 1; overflow-y: auto; margin: 15px 0; }
         .cart-item { background: #f9f9fb; color: var(--negro); padding: 12px; border-radius: 15px; margin-bottom: 10px; border-left: 4px solid var(--dorado-medio); border-bottom: 1px solid #eee; }
         .total-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-top: 1px solid #333; }
-        .total-row span:last-child { font-size: 32px; font-weight: 800; color: var(--dorado-brillo); }
+        .total-row span:last-child { font-size: 32px; font-weight: 800; color: var(--dorado-oscuro); }
 
         .btn-acc { padding: 18px; border: none; border-radius: 18px; font-weight: 800; cursor: pointer; }
         .btn-green { background: var(--verde); color: #fff; width: 100%; margin-bottom: 10px; }
@@ -287,8 +317,8 @@
                     <h3>Productos</h3>
                     <div class="search-grid">
                         <input type="number" id="plu" placeholder="PLU" oninput="buscarPlu()">
-                        <input type="text" id="nom" placeholder="Producto..." oninput="buscarNombre()">
-                        <input type="number" id="cant" value="1">
+                        <input type="text" id="nom" placeholder="Producto..." oninput="buscarNombre()" autocomplete="off">
+                        <input type="number" id="cant" placeholder="1">
                         <button class="btn-agregar" onclick="agregar()">AGREGAR</button>
                     </div>
                     <div class="result-box" id="res"></div>
@@ -337,7 +367,7 @@
 <div id="modalPago" class="modal-overlay">
     <div class="modal-content">
         <h2>Pasarela de Pago</h2>
-        <h1 id="montoPago" style="font-size: 45px; margin: 15px 0; color: var(--dorado-medio);">$ 0</h1>
+        <h1 id="montoPago" style="font-size: 45px; margin: 15px 0; color: var(--negro);">$ 0</h1>
         
         <div class="pay-grid">
             <div class="pay-btn" id="payEfectivo" onclick="seleccionarMetodo('Efectivo')">
@@ -353,10 +383,10 @@
 
         <div id="calcBox" style="display: none; background: #f8f8fa; padding: 20px; border-radius: 20px; margin-bottom: 20px;">
             <label class="label-text" style="font-size:10px; color:#999; margin-bottom:5px; display:block;">PAGA CON:</label>
-            <input type="number" id="pagaCon" placeholder="0" oninput="calcularVueltas()" style="text-align: center; font-size: 22px; font-weight: 800; border:none; background:transparent;">
+            <input type="text" id="pagaCon" placeholder="0" oninput="formatearPagaCon(this)" style="text-align: center; font-size: 22px; font-weight: 800; border:none; background:transparent;">
             <div style="margin-top:15px; border-top:1px solid #ddd; padding-top:10px;">
                 <span style="font-size:12px; color:#666;">CAMBIO:</span>
-                <h2 id="vueltasTxt" style="color: var(--verde);">$ 0</h2>
+                <h2 id="vueltasTxt" style="color: #1a7f37; font-weight: 800;">$ 0</h2>
             </div>
         </div>
 
@@ -398,7 +428,51 @@
     }
 
     function abrirCaja() { cajaActiva = true; sync(); renderCaja(); showToast("Jornada iniciada"); }
-    function confirmarCierre() { if(confirm("¿Cerrar caja?")) { cajaActiva = false; sync(); renderCaja(); showToast("Caja cerrada"); } }
+    async function confirmarCierre() {
+        if(!confirm("¿Deseas cerrar la jornada y guardar el resumen en la nube?")) return;
+
+        showToast("⏳ Procesando cierre...");
+        const hoy = new Date().toISOString().split('T')[0];
+
+        // 1. Consultamos las ventas reales de hoy directamente de Supabase para no fallar
+        const { data: ventasHoy, error: errFetch } = await _supabase
+            .from('ventas')
+            .select('metodo_pago, total_venta')
+            .gte('fecha_hora', hoy);
+
+        if (errFetch) return showToast("❌ Error al obtener ventas: " + errFetch.message);
+
+        // 2. Calculamos los totales exactos
+        let totales = { Efectivo: 0, Nequi: 0, Daviplata: 0 };
+        ventasHoy.forEach(v => { 
+            if (totales[v.metodo_pago] !== undefined) totales[v.metodo_pago] += (v.total_venta || 0); 
+        });
+        let totalG = totales.Efectivo + totales.Nequi + totales.Daviplata;
+
+        try {
+            // 3. Guardamos el registro en la tabla 'cierres'
+            const { error } = await _supabase
+                .from('cierres')
+                .insert([{
+                    total_ventas: totalG,
+                    efectivo: totales.Efectivo,
+                    nequi: totales.Nequi,
+                    daviplata: totales.Daviplata,
+                    fecha_cierre: new Date().toISOString(),
+                    vendedor: 'ADMIN'
+                }]);
+
+            if (error) throw error;
+
+            // 4. Limpieza local y cierre visual
+            cajaActiva = false; 
+            sync(); 
+            renderCaja(); 
+            showToast("✅ Cierre guardado: " + fmt(totalG));
+        } catch (err) {
+            showToast("❌ Error al guardar: " + err.message);
+        }
+    }
     
     function renderCaja() {
         document.getElementById('panelVenta').style.display = cajaActiva ? "block" : "none";
@@ -417,35 +491,50 @@
     }
 
     function buscarNombre() {
-        let val = document.getElementById('nom').value.toLowerCase();
+        let val = document.getElementById('nom').value.toLowerCase().trim();
         let res = document.getElementById('res'); 
-        res.innerHTML = "";
-        if(val.length < 2) return; // Solo busca si hay más de 2 letras para ahorrar procesos
         
-        let filtrados = PRODUCTOS_INVENTARIO.filter(x => x.nombre.toLowerCase().includes(val));
+        if(val.length < 1) {
+            res.innerHTML = "";
+            res.style.display = "none";
+            return;
+        }
         
-        filtrados.slice(0, 10).forEach(p => { // Limitamos a 10 resultados para no saturar
-            let d = document.createElement('div'); 
-            d.className = "item-row";
-            d.innerHTML = `<span>${p.nombre}</span> <b>${fmt(p.precio)}</b>`;
-            d.onclick = () => { 
-                pSel = p; 
-                document.getElementById('nom').value = p.nombre; 
-                document.getElementById('plu').value = p.codigo; 
-                res.innerHTML = ""; 
-                document.getElementById('cant').focus(); // Salta automáticamente a cantidad
-            };
-            res.appendChild(d);
-        });
+        let filtrados = PRODUCTOS_INVENTARIO.filter(x => 
+            x.nombre.toLowerCase().includes(val) || 
+            String(x.codigo).includes(val)
+        );
+        
+        if(filtrados.length > 0) {
+            res.innerHTML = "";
+            res.style.display = "block"; // FORZAMOS QUE SE VEA
+            filtrados.slice(0, 15).forEach(p => {
+                let d = document.createElement('div'); 
+                d.className = "item-row";
+                d.style.background = "white"; 
+                d.innerHTML = `<span>${p.nombre}</span> <b>${fmt(p.precio)}</b>`;
+                d.onclick = () => { 
+                    pSel = p; 
+                    document.getElementById('nom').value = p.nombre; 
+                    document.getElementById('plu').value = p.codigo; 
+                    res.innerHTML = ""; 
+                    res.style.display = "none";
+                    document.getElementById('cant').focus(); 
+                };
+                res.appendChild(d);
+            });
+        } else {
+            res.style.display = "none";
+        }
     }
-
     function agregar() {
-        let n = parseInt(document.getElementById('cant').value);
+        // Si el usuario no pone nada, tomamos 1 por defecto
+        let n = parseInt(document.getElementById('cant').value) || 1;
         if(!pSel || n <= 0) return showToast("Seleccione un producto");
         let item = { uid: Date.now(), nombre: pSel.nombre, precio: pSel.precio, cant: n, sub: pSel.precio * n };
         if(modo === 'rapido') carritoR.push(item);
         else { if(!cActiva) return showToast("Elige un cliente"); cActiva.items.push(item); }
-        document.getElementById('plu').value = ""; document.getElementById('nom').value = ""; document.getElementById('cant').value = "1";
+        document.getElementById('plu').value = ""; document.getElementById('nom').value = ""; document.getElementById('cant').value = "";
         pSel = null; sync(); render(); showToast("Producto agregado");
     }
 
@@ -464,27 +553,81 @@
         
         let chipCont = document.getElementById('chipsCuentas'); chipCont.innerHTML = "";
         cuentas.forEach(c => {
-            let b = document.createElement('button'); b.className = "btn-modo"; b.style.width="auto";
+            let wrapper = document.createElement('div');
+            wrapper.className = "chip-container";
+            
+            let b = document.createElement('button'); 
+            b.className = "btn-modo"; 
+            b.style.width="auto";
+            b.style.paddingRight = "35px"; 
             if(cActiva && cActiva.id === c.id) b.classList.add('cuenta-on'); else b.classList.add('off');
-            b.innerText = c.nombre; b.onclick = () => { cActiva = c; setModo('cuenta'); };
-            chipCont.appendChild(b);
+            b.innerText = c.nombre; 
+            b.onclick = () => { cActiva = c; setModo('cuenta'); };
+            
+            // Botón X para eliminar
+            let delBtn = document.createElement('button');
+            delBtn.className = "btn-borrar-cuenta";
+            delBtn.innerHTML = "✕";
+            delBtn.onclick = (e) => {
+                e.stopPropagation(); // Evita seleccionar la cuenta al borrar
+                eliminarCuentaConClave(c.id);
+            };
+
+            wrapper.appendChild(b);
+            wrapper.appendChild(delBtn);
+            chipCont.appendChild(wrapper);
         });
+    }
+
+    function eliminarCuentaConClave(id) {
+        const pass = prompt("🔐 SEGURIDAD TAMAKU: Ingrese clave para eliminar:");
+        if (pass === "123456") {
+            cuentas = cuentas.filter(x => x.id !== id);
+            if (cActiva && cActiva.id === id) cActiva = null;
+            sync();
+            render();
+            showToast("🗑️ Cuenta eliminada");
+        } else if (pass !== null) {
+            alert("❌ CLAVE INCORRECTA");
+        }
+    }
+
+    function eliminarCuentaSeguro(id) {
+        const pass = prompt("🔐 Ingrese CONTRASEÑA para ELIMINAR cuenta:");
+        if (pass === "123456") {
+            cuentas = cuentas.filter(x => x.id !== id);
+            if (cActiva && cActiva.id === id) cActiva = null;
+            sync();
+            render();
+            showToast("🗑️ Cuenta eliminada correctamente");
+        } else if (pass !== null) {
+            alert("❌ Contraseña INCORRECTA. No tienes permiso.");
+        }
     }
 
     function setModo(m) {
         modo = m;
+        
+        // Limpiamos la búsqueda al cambiar de modo
+        document.getElementById('res').style.display = "none";
+        document.getElementById('res').innerHTML = "";
+
         document.getElementById('cardCuentas').style.display = m === 'cuenta' ? 'block' : 'none';
         document.getElementById('modR').className = m === 'rapido' ? "btn-modo rapido-on" : "btn-modo off";
-        document.getElementById('modC').className = (m === 'cuenta' && cActiva) ? "btn-modo cuenta-on" : "btn-modo off";
+        document.getElementById('modC').className = m === 'cuenta' ? "btn-modo cuenta-on" : "btn-modo off";
+        
         render();
     }
 
     function crearCuenta() {
-        let n = document.getElementById('inputCliente').value.trim();
+        let n = document.getElementById('inputCliente').value.trim().toUpperCase(); 
         if(n) { 
-            let c = {id: Date.now(), nombre: n.toUpperCase(), items: []}; 
-            cuentas.push(c); cActiva = c; document.getElementById('inputCliente').value = ""; 
-            sync(); render(); showToast("Cuenta abierta");
+            let c = {id: Date.now(), nombre: n, items: []}; 
+            cuentas.push(c); cActiva = c; 
+            document.getElementById('inputCliente').value = ""; 
+            sync(); 
+            setModo('cuenta');
+            showToast("Cuenta abierta: " + n);
         }
     }
 
@@ -511,71 +654,92 @@
         if(m === 'Efectivo') {
             document.getElementById('pagaCon').value = "";
             document.getElementById('vueltasTxt').innerText = "$ 0";
-            document.getElementById('pagaCon').focus();
+            setTimeout(() => document.getElementById('pagaCon').focus(), 100);
         }
     }
 
     function calcularVueltas() {
-        let t = parseInt(document.getElementById('montoPago').innerText.replace(/[^0-9]/g, ""));
-        let p = parseInt(document.getElementById('pagaCon').value) || 0;
-        document.getElementById('vueltasTxt').innerText = fmt(p - t > 0 ? p - t : 0);
+    let t = parseInt(document.getElementById('montoPago').innerText.replace(/[^0-9]/g, ""));
+    // Ahora quitamos los puntos del "pagaCon" antes de calcular
+    let p = parseInt(document.getElementById('pagaCon').value.replace(/\./g, "")) || 0;
+    document.getElementById('vueltasTxt').innerText = fmt(p - t > 0 ? p - t : 0);
     }
 
     async function confirmarVentaFinal() {
-    if(!metTemp) return showToast("Seleccione medio de pago");
-    
-    let list = modo === 'rapido' ? [...carritoR] : [...cActiva.items];
-    if(list.length === 0) return showToast("El carrito está vacío");
-
-    let t = list.reduce((a, b) => a + b.sub, 0);
-    let cliente = modo === 'rapido' ? 'V.RÁPIDA' : cActiva.nombre;
-    let pagCon = parseInt(document.getElementById('pagaCon').value) || 0;
-    let vueltas = (pagCon - t > 0) ? (pagCon - t) : 0;
-
-    // BLOQUE 1: Insertar en la tabla 'ventas' (Cabecera)
-    const { data: ventaData, error: errorVenta } = await _supabase
-        .from('ventas')
-        .insert([{
-            cliente: cliente,
-            metodo_pago: metTemp,
-            total_venta: t,
-            pago_con: pagCon,
-            cambio: vueltas
-        }])
-        .select();
-
-    if (errorVenta) return showToast("❌ Error factura: " + errorVenta.message);
-
-    // BLOQUE 2: Preparar los productos para 'venta_detalles'
-    const idVenta = ventaData[0].id;
-    const detalles = list.map(item => ({
-        venta_id: idVenta,
-        nombre_producto: item.nombre,
-        cantidad: item.cant,
-        precio_unitario: item.precio,
-        subtotal: item.sub
-    }));
-
-    // BLOQUE 3: Insertar todos los productos de un solo golpe
-    const { error: errorDetalle } = await _supabase
-        .from('venta_detalles')
-        .insert(detalles);
-
-    if(!errorDetalle) {
-        // Limpiar todo si salió bien
-        if(modo === 'rapido') carritoR = []; 
-        else { cuentas = cuentas.filter(x => x.id !== cActiva.id); cActiva = null; }
+        if(!metTemp) return showToast("Seleccione medio de pago");
         
-        document.getElementById('modalPago').style.display = "none";
-        if (window.innerWidth <= 768) document.getElementById('cartPanel').classList.remove('open');
-        
-        sync(); 
-        render();
-        showToast("✅ Venta registrada con éxito");
-    } else {
-        showToast("❌ Error productos: " + errorDetalle.message);
+        let list = modo === 'rapido' ? [...carritoR] : [...cActiva.items];
+        if(list.length === 0) return showToast("El carrito está vacío");
+
+        let t = list.reduce((a, b) => a + b.sub, 0);
+        let cliente = modo === 'rapido' ? 'V.RÁPIDA' : cActiva.nombre;
+        let pagCon = parseInt(document.getElementById('pagaCon').value.replace(/\./g, "")) || 0;
+        let vueltas = (pagCon - t > 0) ? (pagCon - t) : 0;
+
+        // 1. REGISTRAR LA VENTA (CABECERA)
+        const { data: ventaData, error: errorVenta } = await _supabase
+            .from('ventas')
+            .insert([{
+                cliente: cliente,
+                metodo_pago: metTemp,
+                total_venta: t,
+                pago_con: pagCon,
+                cambio: vueltas
+            }])
+            .select();
+
+        if (errorVenta) return showToast("❌ Error factura: " + errorVenta.message);
+
+        // 2. PREPARAR Y GUARDAR DETALLES
+        const idVenta = ventaData[0].id;
+        const detalles = list.map(item => ({
+            venta_id: idVenta,
+            nombre_producto: item.nombre,
+            cantidad: item.cant,
+            precio_unitario: item.precio,
+            subtotal: item.sub
+        }));
+
+        const { error: errorDetalle } = await _supabase
+            .from('venta_detalles')
+            .insert(detalles);
+
+        if(!errorDetalle) {
+            // --- PASO 4: MOTOR DE INVENTARIO (Sincronización) ---
+            for (const item of list) {
+                // Buscamos el producto por nombre para obtener stock actual y vendidos
+                const { data: prod } = await _supabase
+                    .from('productos')
+                    .select('stock, vendidos')
+                    .eq('nombre', item.nombre)
+                    .single();
+                
+                if (prod) {
+                    await _supabase
+                        .from('productos')
+                        .update({ 
+                            stock: (prod.stock || 0) - item.cant,
+                            vendidos: (prod.vendidos || 0) + item.cant 
+                        })
+                        .eq('nombre', item.nombre);
+                }
+            }
+            // ---------------------------------------------------
+
+            // LIMPIEZA DE INTERFAZ
+            if(modo === 'rapido') carritoR = []; 
+            else { cuentas = cuentas.filter(x => x.id !== cActiva.id); cActiva = null; }
+            
+            document.getElementById('modalPago').style.display = "none";
+            if (window.innerWidth <= 768) document.getElementById('cartPanel').classList.remove('open');
+            
+            sync(); 
+            render();
+            showToast("✅ Venta registrada e inventario actualizado");
+        } else {
+            showToast("❌ Error productos: " + errorDetalle.message);
+        }
     }
-}
     function confirmarBorrado() { if(confirm("¿Vaciar carrito?")) { if(modo === 'rapido') carritoR = []; else if(cActiva) cActiva.items = []; sync(); render(); showToast("Vaciado"); } }
 
     async function mostrarAuditoria() {
@@ -694,6 +858,20 @@ async function verDetalleVenta(id, cliente) {
     setInterval(() => document.getElementById('reloj').innerText = new Date().toLocaleTimeString(), 1000);
     async function iniciar() { await cargarProductosDesdeNube(); renderCaja(); render(); }
     iniciar();
+    function formatearPagaCon(input) {
+    // Quitamos cualquier cosa que no sea número
+    let valor = input.value.replace(/\D/g, "");
+    
+    // Si hay valor, lo formateamos con puntos de miles
+    if (valor !== "") {
+        input.value = Number(valor).toLocaleString('es-CO');
+    } else {
+        input.value = "";
+    }
+    
+    // Llamamos a la función original de vueltas
+    calcularVueltas();
+}
 </script>
 </body>
 </html>
